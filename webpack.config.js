@@ -80,7 +80,6 @@ const config = {
       { from: "node_modules/jquery/dist/jquery.min.js", to: "js/jquery.min.js" }
     ])
   ],
-
   module: {
     rules: [
       {

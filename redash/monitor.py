@@ -7,23 +7,13 @@ def get_redis_status():
 
 
 def get_object_counts():
-
-
-
     status = {}
-
     status['queries_count'] = models.db.session.query(models.Query).count()
-
     if settings.FEATURE_SHOW_QUERY_RESULTS_COUNT:
-
         status['query_results_count'] = models.db.session.query(models.QueryResult).count()
-
         status['unused_query_results_count'] = models.QueryResult.unused().count()
-
     status['dashboards_count'] = models.Dashboard.query.count()
-
     status['widgets_count'] = models.Widget.query.count()
-
     return status
 
 
@@ -45,7 +35,7 @@ def get_queues_status():
             'data_sources': ', '.join(sources),
             'size': redis_connection.llen(queue)
         }
-
+    
     queues['celery'] = {
         'size': redis_connection.llen('celery'),
         'data_sources': ''

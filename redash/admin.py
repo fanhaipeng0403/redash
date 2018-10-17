@@ -40,11 +40,8 @@ class JSONTextAreaField(fields.TextAreaField):
 
 
 class BaseModelView(ModelView):
-
     column_display_pk = True
-
     model_form_converter = AdminModelConverter
-
     form_excluded_columns = ('created_at', 'updated_at')
 
     @require_super_admin
@@ -57,7 +54,6 @@ class QueryResultModelView(BaseModelView):
 
 
 class QueryModelView(BaseModelView):
-
     column_exclude_list = ('latest_query_data',)
     form_excluded_columns = ('version', 'visualizations', 'alerts', 'org', 'created_at',
                              'updated_at', 'latest_query_data', 'search_vector')
@@ -70,8 +66,8 @@ class DashboardModelView(BaseModelView):
 
 
 def init_admin(app):
-
     admin = Admin(app, name='Redash Admin', template_mode='bootstrap3')
+
     admin.add_view(QueryModelView(models.Query, models.db.session))
     admin.add_view(QueryResultModelView(models.QueryResult, models.db.session))
     admin.add_view(DashboardModelView(models.Dashboard, models.db.session))

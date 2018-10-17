@@ -50,7 +50,7 @@ def load_user(user_id):
 
 def hmac_load_user_from_request(request):
     signature = request.args.get('signature')
-    expires = Float(request.args.get('expires') or 0)
+    expires = float(request.args.get('expires') or 0)
     query_id = request.view_args.get('query_id', None)
     user_id = request.args.get('user_id', None)
 

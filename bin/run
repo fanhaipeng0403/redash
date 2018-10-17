@@ -8,6 +8,3 @@ source $TEMP_ENV_FILE
 rm $TEMP_ENV_FILE
 
 exec "$@"
-
-
-# mktemp tmp.xxxx #生成临时文件

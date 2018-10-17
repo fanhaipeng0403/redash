@@ -1,10 +1,10 @@
 #!/bin/bash
 #
-# This script setups Redash along with supervisor, nginx, PostgreSQL and Redis. It was written to be used on 
+# This script setups Redash along with supervisor, nginx, PostgreSQL and Redis. It was written to be used on
 # Ubuntu 16.04. Technically it can work with other Ubuntu versions, but you might get non compatible versions
 # of PostgreSQL, Redis and maybe some other dependencies.
 #
-# This script is not idempotent and if it stops in the middle, you can't just run it again. You should either 
+# This script is not idempotent and if it stops in the middle, you can't just run it again. You should either
 # understand what parts of it to exclude or just start over on a new VM (assuming you're using a VM).
 
 set -eu
@@ -27,8 +27,29 @@ verify_root() {
             exit 1
         fi
         echo "This script must be run as root. Trying to run with sudo."
+#        $$
+#Shell本身的PID（ProcessID）
+#        $!
+#Shell最后运行的后台Process的PID
+#        $?
+#最后运行的命令的结束代码（返回值）
+#        $-
+#使用Set命令设定的Flag一览
+#        $*
+#所有参数列表。如"$*"用「"」括起来的情况、以"$1 $2 … $n"的形式输出所有参数。
+#        $@
+#所有参数列表。如"$@"用「"」括起来的情况、以"$1" "$2" … "$n" 的形式输出所有参数。
+#        $#
+#添加到Shell的参数个数
+#        $0
+#Shell本身的文件名
+#        $1～$n
+#添加到Shell的各参数值。$1是第1参数、$2是第2参数…。
+
         sudo bash "$0" --with-sudo
         exit 0
+#        exit（0）：正常运行程序并退出程序；
+#        exit（1）：非正常运行导致退出程序
     fi
 }
 
@@ -52,7 +73,7 @@ install_system_packages() {
 create_directories() {
     mkdir -p $REDASH_BASE_PATH
     chown redash $REDASH_BASE_PATH
-    
+
     # Default config file
     if [ ! -f "$REDASH_BASE_PATH/.env" ]; then
         sudo -u redash wget "$FILES_BASE_URL/env" -O $REDASH_BASE_PATH/.env

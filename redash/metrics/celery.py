@@ -48,6 +48,5 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         logging.debug("metric=%s", json.dumps({'metric': metric, 'tags': tags, 'value': run_time}))
         statsd_client.timing(metric_name(metric, tags), run_time)
         statsd_client.incr(metric_name('celery.task.{}.{}'.format(normalized_task_name, state), tags))
-
     except Exception:
         logging.exception("Exception during task_postrun handler.")
