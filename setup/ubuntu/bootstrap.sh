@@ -1,3 +1,10 @@
+
+# 验证权限---安装基本系统依赖----创建用户----创建项目文件夹-----下载项目文件----提取文件-------安装代码依赖------创建数据库----创建进程管理----创建WEB服务器
+
+
+
+
+
 #!/bin/bash
 #
 # This script setups Redash along with supervisor, nginx, PostgreSQL and Redis. It was written to be used on
@@ -211,3 +218,5 @@ install_python_packages
 create_database
 setup_supervisor
 setup_nginx
+
+
