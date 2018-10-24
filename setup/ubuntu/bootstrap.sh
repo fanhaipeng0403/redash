@@ -150,6 +150,11 @@ extract_redash_sources() {
 # 下载"$LATEST_URL"的内容，重新命名为 "$REDASH_TARBALL"
     sudo -u redash wget "$LATEST_URL" -O "$REDASH_TARBALL"
     sudo -u redash mkdir "$VERSION_DIR"
+
+#  -C 切换到指定目录
+# -x 解压提取 v 显示操作过程 f 指定文件
+# 另一个文件的夹的压缩文件，解压到这个文件夹下面
+
     sudo -u redash tar -C "$VERSION_DIR" -xvf "$REDASH_TARBALL"
     ln -nfs "$VERSION_DIR" $REDASH_BASE_PATH/current
     ln -nfs $REDASH_BASE_PATH/.env $REDASH_BASE_PATH/current/.env
