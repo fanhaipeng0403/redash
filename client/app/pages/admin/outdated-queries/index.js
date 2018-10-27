@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment'
 
 import { Paginator } from '@/lib/pagination';
 import template from './outdated-queries.html';
