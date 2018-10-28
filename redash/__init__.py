@@ -1,23 +1,22 @@
-import os
 import sys
 import logging
-import urlparse
+import sys
 import urllib
+
 import redis
-from flask import Flask, safe_join
-from flask_sslify import SSLify
-from werkzeug.contrib.fixers import ProxyFix
-from werkzeug.routing import BaseConverter, ValidationError
-from statsd import StatsClient
-from flask_mail import Mail
+import urlparse
+from flask import Flask
 from flask_limiter import Limiter
 from flask_limiter.util import get_ipaddr
+from flask_mail import Mail
 from flask_migrate import Migrate
-
+from flask_sslify import SSLify
 from redash import settings
-from redash.query_runner import import_query_runners
 from redash.destinations import import_destinations
-
+from redash.query_runner import import_query_runners
+from statsd import StatsClient
+from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.routing import BaseConverter
 
 __version__ = '5.0.0-beta'
 
@@ -73,6 +72,7 @@ import_query_runners(settings.QUERY_RUNNERS)
 import_destinations(settings.DESTINATIONS)
 
 from redash.version_check import reset_new_version_status
+
 reset_new_version_status()
 
 
