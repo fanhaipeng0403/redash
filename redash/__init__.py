@@ -1,4 +1,3 @@
-import sys
 import logging
 import sys
 import urllib
@@ -18,6 +17,7 @@ from statsd import StatsClient
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.routing import BaseConverter
 
+# 入口文件指定版本号,是个好习惯
 __version__ = '5.0.0-beta'
 
 
@@ -60,7 +60,11 @@ def create_redis_connection():
     return r
 
 
+# 配置日志文件
 setup_logging()
+
+
+# 连接Nosql
 redis_connection = create_redis_connection()
 mail = Mail()
 migrate = Migrate()
@@ -100,16 +104,26 @@ def create_app(load_admin=True):
     from redash.metrics.request import provision_app
 
     app = Flask(__name__,
+                # 指定静态文件目录
+                # fix_assets_path(os.environ.get("REDASH_STATIC_ASSETS_PATH", "../client/dist/"))
                 template_folder=settings.STATIC_ASSETS_PATH,
                 static_folder=settings.STATIC_ASSETS_PATH,
                 static_path='/static')
 
     # Make sure we get the right referral address even behind proxies like nginx.
+    # 难点。。。。
     app.wsgi_app = ProxyFix(app.wsgi_app, settings.PROXIES_COUNT)
+
+
+    # https: // allenwind.github.io / 2017 / 12 / 29 / Flask % E8 % 87 % AA % E5 % AE % 9 A % E4 % B9 % 89 URL - Converter /
+    #  定制url
     app.url_map.converters['org_slug'] = SlugConverter
 
+    # 根据setting文件配置
     if settings.ENFORCE_HTTPS:
         SSLify(app, skips=['ping'])
+
+    # 异常警报和通知处理
 
     if settings.SENTRY_DSN:
         from raven import Client
@@ -124,21 +138,43 @@ def create_app(load_admin=True):
         sentry_handler.setLevel(logging.ERROR)
         logging.getLogger().addHandler(sentry_handler)
 
-    # configure our database
+    # 数据库配置
     app.config['SQLALCHEMY_DATABASE_URI'] = settings.SQLALCHEMY_DATABASE_URI
+
+    # 默认自带的配置
     app.config.update(settings.all_settings())
 
-    provision_app(app)
-    db.init_app(app)
-    migrate.init_app(app, db)
+    # 插件和自定义插件初始化
     if load_admin:
         init_admin(app)
+
+    # 数据库
+    db.init_app(app)
+
+    # 数据库迁移
+    migrate.init_app(app, db)
+    # 邮件
     mail.init_app(app)
-    setup_authentication(app)
+    # 请求次数
     limiter.init_app(app)
-    handlers.init_app(app)
-    configure_webpack(app)
-    extensions.init_extensions(app)
+    # logger
     chrome_logger.init_app(app)
+    extensions.init_extensions(app)
+
+    # 一些请求前后的狗子，用于性能测试等
+    provision_app(app)
+
+    # 所有的controller入口！！！！！
+
+    handlers.init_app(app)
+
+    # api 认证接口注册！！！！
+    setup_authentication(app)
+
+    # webpack!!!!!
+    configure_webpack(app)
 
     return app
+
+# 入口文件创立flask app
+# 初始化一些任务
