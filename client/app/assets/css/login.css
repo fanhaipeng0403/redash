@@ -18,6 +18,9 @@ body {
   height: calc(100vh - 116px);
 }
 
+/*min , 取反， 大于992px，生效*/
+/*max, 取反， 小于某个值，生效*/
+
 @media (min-width: 992px) {
   .content-container {
     height: 100%;

@@ -1,6 +1,13 @@
 import debug from 'debug';
 
+// https://segmentfault.com/a/1190000012699304
+// 后端利用process.env.DEBUG，前端利用localStorage
+// 定制化日志输出
 export const logger = debug('redash:directives');
+
+
+
+
 
 
 // https://javascript.ruanyifeng.com/htmlapi/requestanimationframe.html
