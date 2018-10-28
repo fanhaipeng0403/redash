@@ -103,10 +103,19 @@ def create_app(load_admin=True):
     from redash.authentication import setup_authentication
     from redash.metrics.request import provision_app
 
+
+    # https: // www.v2ex.com / t / 289972
+
+    #创建 flask 对象时候，是需要传一个模块一般是__name__过去，你改下就行了，那个是被当作根地址,确定了template位置
+    #也可以在蓝图的时候指定
+
+
     app = Flask(__name__,
                 # 指定静态文件目录
                 # fix_assets_path(os.environ.get("REDASH_STATIC_ASSETS_PATH", "../client/dist/"))
                 template_folder=settings.STATIC_ASSETS_PATH,
+
+                # https://blog.csdn.net/qq_40952927/article/details/81157204
                 static_folder=settings.STATIC_ASSETS_PATH,
                 static_path='/static')
 
@@ -115,7 +124,7 @@ def create_app(load_admin=True):
     app.wsgi_app = ProxyFix(app.wsgi_app, settings.PROXIES_COUNT)
 
 
-    # https: // allenwind.github.io / 2017 / 12 / 29 / Flask % E8 % 87 % AA % E5 % AE % 9 A % E4 % B9 % 89 URL - Converter /
+
     #  定制url
     app.url_map.converters['org_slug'] = SlugConverter
 
