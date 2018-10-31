@@ -198,6 +198,9 @@ setup_supervisor() {
 
 #wget -O wordpress.zip http://www.centos.bz/download.php?id=1080
 
+
+    ####整个程序的进程管理，自启动之类的
+
     wget -O /etc/supervisor/conf.d/redash.conf "$FILES_BASE_URL/supervisord.conf"
     service supervisor restart
 }
