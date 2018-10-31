@@ -5,6 +5,31 @@
 # 1. To persist Postgres data, assign it a volume host location.
 # 2. Split the worker service to adhoc workers and scheduled queries workers.
 
+###############################################
+
+# 这里温习一些linux的命令和文件系统
+
+#curl -L https://github.com/docker/compose/releases/download/1.8.0/run.sh > /usr/local/bin/docker-compose
+
+# > 如果没有这个文件，将创建
+
+# -L location (HTTP/HTTPS)如果服务器报告说请求页面已经转移到其他地址了（头部Location:会表明，和 3XX响应码），这个选项将会让curl重做请求到新的位置
+
+
+#/bin  存放所有用户皆可用的系统程序，系统启动或者系统修复时可用（在没有挂载 /usr 目录时就可以使用）
+#/sbin 存放超级用户才能使用的系统程序
+#/usr/bin 存放所有用户都可用的应用程序
+#/usr/sbin 存放超级用户才能使用的应用程序
+
+#/usr/local/bin 存放所有用户都可用的与本地机器无关的程序
+#/usr/local/sbin 存放超级用户才能使用的与本地机器无关的程序
+
+
+#/usr/bin 存放所有用户都可用的应用程序
+#/usr/local/bin 存放所有用户都可用的与本地机器无关的程序
+
+
+###############################################
 
 #YAML语法
 #http://www.ruanyifeng.com/blog/2016/07/yaml.html
@@ -14,11 +39,23 @@
 #- 表示数组
 
 
+###############################################
 
+#compose 中的重要概念
+
+#项目 (project)：由一组关联的应用容器组成的一个完整业务单元，在 docker-compose.yml 文件中定义。
+
+#服务 (service)：一个应用的容器，实际上可以包括若干运行相同镜像的容器实例。
+
+#只要所操作的平台支持 Docker API，就可以在其上利用 Compose 来进行编排管理。
+
+###############################################
 
 version: '2'
 services:
 
+
+###############################################
 #5个容器
 
 # Web service
@@ -28,36 +65,44 @@ services:
     # gunicorn 命令, docker-entrypoint定义的
     command: server
 
+###############################################################
+###为什么没有worker和Nginx
     depends_on:
       - postgres
       - redis
+
+###############################################################
     ports:
       - "5000:5000"
     environment:
+   # 电脑shell的环境变量
       PYTHONUNBUFFERED: 0
       REDASH_LOG_LEVEL: "INFO"
       REDASH_REDIS_URL: "redis://redis:6379/0"
       REDASH_DATABASE_URL: "postgresql://postgres@postgres/postgres"
       REDASH_COOKIE_SECRET: veryverysecret
       REDASH_WEB_WORKERS: 4
+
     restart: always
 
 
 # 任务队列，消息队列, 这个配置相对复杂些
   worker:
-    image: redash/redash:latest
 
+    image: redash/redash:latest
 
     # celery 命令, docker-entrypoint定义的
     command: scheduler
 
     environment:
+
       PYTHONUNBUFFERED: 0
       REDASH_LOG_LEVEL: "INFO"
       REDASH_REDIS_URL: "redis://redis:6379/0"
       REDASH_DATABASE_URL: "postgresql://postgres@postgres/postgres"
       QUEUES: "queries,scheduled_queries,celery"
       WORKERS_COUNT: 2
+
     restart: always
 
 # Cache
@@ -68,6 +113,9 @@ services:
 # Sql
   postgres:
     image: postgres:9.5.6-alpine
+
+
+########################数据库本地存储############################
     # volumes:
     #   - /opt/postgres-data:/var/lib/postgresql/data
     restart: always
@@ -79,8 +127,13 @@ services:
     image: redash/nginx:latest
     ports:
       - "80:80"
+
+
+############???????????????????????#############
     depends_on:
       - server
     links:
       - server:redash
+
+############???????????????????????#############
     restart: always
