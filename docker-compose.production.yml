@@ -4,11 +4,30 @@
 # Some other recommendations:
 # 1. To persist Postgres data, assign it a volume host location.
 # 2. Split the worker service to adhoc workers and scheduled queries workers.
+
+
+#YAML语法
+#http://www.ruanyifeng.com/blog/2016/07/yaml.html
+
+#: 表示key-value
+#缩进表示层级
+#- 表示数组
+
+
+
+
 version: '2'
 services:
+
+#5个容器
+
+# Web service
   server:
     image: redash/redash:latest
+
+    # gunicorn 命令, docker-entrypoint定义的
     command: server
+
     depends_on:
       - postgres
       - redis
@@ -22,9 +41,16 @@ services:
       REDASH_COOKIE_SECRET: veryverysecret
       REDASH_WEB_WORKERS: 4
     restart: always
+
+
+# 任务队列，消息队列, 这个配置相对复杂些
   worker:
     image: redash/redash:latest
+
+
+    # celery 命令, docker-entrypoint定义的
     command: scheduler
+
     environment:
       PYTHONUNBUFFERED: 0
       REDASH_LOG_LEVEL: "INFO"
@@ -33,14 +59,22 @@ services:
       QUEUES: "queries,scheduled_queries,celery"
       WORKERS_COUNT: 2
     restart: always
+
+# Cache
   redis:
     image: redis:3.0-alpine
     restart: always
+
+# Sql
   postgres:
     image: postgres:9.5.6-alpine
     # volumes:
     #   - /opt/postgres-data:/var/lib/postgresql/data
     restart: always
+
+
+# Web server
+
   nginx:
     image: redash/nginx:latest
     ports:
