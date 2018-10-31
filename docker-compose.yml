@@ -1,7 +1,16 @@
+# 开发环境和线上环境两个
+
+
+
+
+
+
 # This configuration file is for **development** setup. For production, refer to
 # docker-compose.production.yml.
 version: '2'
 services:
+
+
   server:
     build: .
     command: dev_server
@@ -11,19 +20,33 @@ services:
     ports:
       - "5000:5000"
     volumes:
+
+
+#####与开发环境的代码映射
       - ".:/app"
+
     environment:
       PYTHONUNBUFFERED: 0
       REDASH_LOG_LEVEL: "INFO"
       REDASH_REDIS_URL: "redis://redis:6379/0"
       REDASH_DATABASE_URL: "postgresql://postgres@postgres/postgres"
+
+
   worker:
     build: .
     command: scheduler
+
+
+
+    ###########????????????????????????##################
+
+#####与开发环境的代码映射
     volumes_from:
       - server
+
     depends_on:
       - server
+
     environment:
       PYTHONUNBUFFERED: 0
       REDASH_LOG_LEVEL: "INFO"
@@ -31,9 +54,14 @@ services:
       REDASH_DATABASE_URL: "postgresql://postgres@postgres/postgres"
       QUEUES: "queries,scheduled_queries,celery"
       WORKERS_COUNT: 2
+
+
   redis:
     image: redis:3.0-alpine
     restart: unless-stopped
+
+
+
   postgres:
     image: postgres:9.5.6-alpine
     # The following turns the DB into less durable, but gains significant performance improvements for the tests run (x3
@@ -41,3 +69,6 @@ services:
     # tests.
     command: "postgres -c fsync=off -c full_page_writes=off -c synchronous_commit=OFF"
     restart: unless-stopped
+
+
+

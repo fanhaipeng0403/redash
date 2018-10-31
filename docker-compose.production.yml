@@ -3,7 +3,9 @@
 #
 # Some other recommendations:
 # 1. To persist Postgres data, assign it a volume host location.
-# 2. Split the worker service to adhoc workers and scheduled queries workers.
+
+# 2. Split the worker service to   adhoc workers and scheduled queries workers.
+# 将adhoc和scheduled quries worker 最好放到两个服务里
 
 ###############################################
 
@@ -159,6 +161,7 @@ services:
 ########################数据库本地存储############################
     volumes:
     # HOST:CONTAINER:ro
+    # 两个文件夹
        - /opt/postgres-data:/var/lib/postgresql/data
     restart: always
 
