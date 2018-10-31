@@ -41,6 +41,18 @@
 
 ###############################################
 
+
+#Docker-compose 就是对多个容器的编排管理，
+#比如 docker-compse build ，
+#等效于对project下的每一个service的images，执行docker  run xxxxxx
+#使得对多个容器的管理更便捷
+
+###############################################
+#docker-compose的命令
+#https://yeasy.gitbooks.io/docker_practice/compose/commands.html
+
+
+###############################################
 #compose 中的重要概念
 
 #项目 (project)：由一组关联的应用容器组成的一个完整业务单元，在 docker-compose.yml 文件中定义。
@@ -62,12 +74,32 @@ services:
   server:
     image: redash/redash:latest
 
+
+###############################################
+
+#两种方式，一种根据Dockerfile文件build，一种现成的image
+
+# image 指令指定镜像或 build 指令（需要 Dockerfile）等来自动构建生成镜像。
+#
+#如果使用 build 指令，在 Dockerfile 中设置的选项(例如：CMD, EXPOSE, VOLUME, ENV 等) 将会自动被获取，无需在 docker-compose.yml 中再次设置。
+
+#    build:
+#      context: ./dir
+#      dockerfile: Dockerfile-alternate
+#      args:
+#        buildno: 1
+
+###############################################
     # gunicorn 命令, docker-entrypoint定义的
+    #一般Dockerfile文件会有个CMD，这个会覆盖掉
+    #覆盖容器启动后默认执行的命令,
+
     command: server
 
 ###############################################################
 ###为什么没有worker和Nginx
     depends_on:
+#    解决容器的依赖、启动先后的问题, postgres先启动，redis再启动
       - postgres
       - redis
 
@@ -76,6 +108,15 @@ services:
       - "5000:5000"
     environment:
    # 电脑shell的环境变量
+
+#   !!!!!!!!!!!!!!!!!!!!!!!!!!
+#  如果变量名称或者值中用到 true|false，yes|no 等表达 布尔 含义的词汇，最好放到引号里，避免 YAML 自动解析某些内容为对应的布尔语义。这些特定词汇，包括
+#y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF
+#   还有
+#注意：当使用 HOST:CONTAINER 格式来映射端口时，如果你使用的容器端口小于 60 并且没放到引号里，可能会得到错误结果，因为 YAML 会自动解析 xx:yy 这种数字格式为 60 进制。为避免出现这种问题，建议数字串都采用引号包括起来的字符串格式。
+
+
+
       PYTHONUNBUFFERED: 0
       REDASH_LOG_LEVEL: "INFO"
       REDASH_REDIS_URL: "redis://redis:6379/0"
@@ -116,8 +157,9 @@ services:
 
 
 ########################数据库本地存储############################
-    # volumes:
-    #   - /opt/postgres-data:/var/lib/postgresql/data
+    volumes:
+    # HOST:CONTAINER:ro
+       - /opt/postgres-data:/var/lib/postgresql/data
     restart: always
 
 
@@ -132,8 +174,22 @@ services:
 ############???????????????????????#############
     depends_on:
       - server
+
+# links
+#注意：不推荐使用该指令。
+
+#https://stackoverflow.com/questions/35832095/difference-between-links-and-depends-on-in-docker-compose-yml
+
+# ngnix容器 总是连接 server服务，即使server使用了-P,每次生成的container的port都不一样
+# 但是我们在具体的项目中，不建议使用-P,随机端口
+# 我们不推荐使用这个命令
+
     links:
-      - server:redash
+      - server
+
+
+
+
 
 ############???????????????????????#############
     restart: always
