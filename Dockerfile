@@ -55,5 +55,24 @@ RUN npm install && npm run build && rm -rf node_modules
 RUN chown -R redash /app
 USER redash
 
+# EntryPoint
+
+#https://yeasy.gitbooks.io/docker_practice/image/dockerfile/entrypoint.html
+
+#  ENTRYPOINT 的目的和 CMD 一样，都是在指定容器启动程序及参数。
+
+#  当指定了 ENTRYPOINT 后，CMD 的含义就发生了改变，不再是直接的运行其命令，而是将 CMD 的内容作为参数传给 ENTRYPOINT 指令，换句话说实际执行时，将变为：
+
+#  <ENTRYPOINT> "<CMD>"
+
 ENTRYPOINT ["/app/bin/docker-entrypoint"]
 CMD ["server"]
+
+
+
+#相当于
+
+#./docker-entrypoint sever
+
+#./ 告诉bash解释器，脚本在当前目录下, 不加的话，如果此目录在环境变量PATH里亦可
+

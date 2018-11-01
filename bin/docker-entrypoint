@@ -1,6 +1,7 @@
-####这个文件放到哪里？？？？一定是bin么
 
-
+#https://yeasy.gitbooks.io/docker_practice/image/dockerfile/entrypoint.html
+#应用运行前的准备工作
+# 启动容器就是启动主进程，但有些时候，启动主进程前，需要一些准备工作。
 
 
 
@@ -61,37 +62,67 @@ tests() {
   exec pytest $TEST_ARGS
 }
 
+
+#$0	当前脚本的文件名
+#$n	传递给脚本或函数的参数。n 是一个数字，表示第几个参数。例如，第一个参数是$1，第二个参数是$2。
+#$#	传递给脚本或函数的参数个数。
+
+#http://c.biancheng.net/cpp/view/2739.html
+
+
+
+# case 的用法
+#http://c.biancheng.net/cpp/view/7006.html
+
+
+
 case "$1" in
   worker)
     shift
     worker
     ;;
+
   server)
+#  https://www.jianshu.com/p/b1bf21247831
     shift
     server
     ;;
+
   scheduler)
     shift
     scheduler
     ;;
+
+
   dev_server)
     export FLASK_DEBUG=1
+#     monitor Python files for change
     exec /app/manage.py runserver --debugger --reload -h 0.0.0.0
     ;;
+
+
   shell)
     exec /app/manage.py shell
     ;;
+
+
   create_db)
     create_db
     ;;
+
+
   manage)
     shift
     exec /app/manage.py $*
     ;;
+
+
   tests)
     shift
     tests $@
     ;;
+
+
   help)
     shift
     help
@@ -99,5 +130,6 @@ case "$1" in
   *)
     exec "$@"
     ;;
+
 esac
 
