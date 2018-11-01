@@ -122,7 +122,10 @@ case "$1" in
 
   manage)
     shift
+# 如果不适应shift的话，manage本身也会在$*里
+#   $* 传递给脚本或函数的所有参数 和 $@乐西
     exec /app/manage.py $*
+
     ;;
 
 
@@ -147,4 +150,3 @@ esac
 
 
 
-#shift 存疑！！！！！！！！！
