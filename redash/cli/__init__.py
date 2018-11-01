@@ -11,6 +11,12 @@ from redash.cli import users, groups, database, data_sources, organization
 from redash.monitor import get_status
 
 
+#######################这样可以#######################
+def foo():
+     """132132132"""
+
+
+
 def create(group):
     app = current_app or create_app()
     group.app = app
@@ -23,6 +29,13 @@ def create(group):
     return app
 
 
+# https://isudox.com/2016/09/03/learning-python-package-click/
+ cls(name=name or f.__name__.lower(),
+               callback=f, params=params, **attrs)
+
+# @click.group 装饰器把方法装饰为
+# 可以拥有多个子命令的 Group 对象
+# 由 Group.add_command() 方法把 Command 对象关联到 Group 对象。
 @click.group(cls=FlaskGroup, create_app=create)
 def manager():
     """Management script for Redash"""
@@ -35,7 +48,7 @@ manager.add_command(data_sources.manager, "ds")
 manager.add_command(organization.manager, "org")
 manager.add_command(run_command, "runserver")
 
-
+# 也可以直接用 @Group.command 装饰方法，会自动把方法关联到该 Group 对象下。
 @manager.command()
 def version():
     """Displays Redash version."""
