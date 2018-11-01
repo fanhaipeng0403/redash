@@ -34,6 +34,8 @@ services:
 
   worker:
     build: .
+
+    ###也来自build，所有也可以使用docker-entryPoint里的定义的scheduler函数
     command: scheduler
 
 
