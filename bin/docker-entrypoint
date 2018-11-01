@@ -7,7 +7,11 @@
 
 
 #!/bin/bash
+
 set -e
+#任何命令出错就立刻exit
+
+
 
 worker() {
   WORKERS_COUNT=${WORKERS_COUNT:-2}
@@ -63,11 +67,13 @@ tests() {
 }
 
 
+#http://c.biancheng.net/cpp/view/2739.html
+
 #$0	当前脚本的文件名
 #$n	传递给脚本或函数的参数。n 是一个数字，表示第几个参数。例如，第一个参数是$1，第二个参数是$2。
 #$#	传递给脚本或函数的参数个数。
+#$@	传递给脚本或函数的所有参数。被双引号(" ")包含时，与 $* 稍有不同，下面将会讲到。
 
-#http://c.biancheng.net/cpp/view/2739.html
 
 
 
@@ -83,7 +89,10 @@ case "$1" in
     ;;
 
   server)
+#  shift的用法
 #  https://www.jianshu.com/p/b1bf21247831
+
+# 参数数组左移，[1,2,3], shift后，$1是2，$#是2，$@是[2,3]
     shift
     server
     ;;
@@ -119,6 +128,7 @@ case "$1" in
 
   tests)
     shift
+#    $@	传递给脚本或函数的所有参数。被双引号(" ")包含时，与 $* 稍有不同，下面将会讲到。
     tests $@
     ;;
 
@@ -127,9 +137,14 @@ case "$1" in
     shift
     help
     ;;
+#如果无一匹配模式，使用星号 * 捕获该值，再执行后面的命令。
   *)
     exec "$@"
+# 执行参数表示的命令
     ;;
 
 esac
 
+
+
+#shift 存疑！！！！！！！！！

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+
+case "$1" in
+
+  worker)
+    shift
+    echo "worker"
+    ;;
+
+  server)
+
+    shift
+    echo "server"
+    ;;
+
+  scheduler)
+    shift
+    echo "scheduler"
+    ;;
+      *)
+    exec "$@"
+    ;;
+
+
+esac
