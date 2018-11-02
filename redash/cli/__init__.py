@@ -1,11 +1,10 @@
 from __future__ import print_function
+
 import json
 
-
 import click
-from flask.cli import FlaskGroup, run_command
 from flask import current_app
-
+from flask.cli import FlaskGroup, run_command
 from redash import create_app, settings, __version__
 from redash.cli import users, groups, database, data_sources, organization
 from redash.monitor import get_status
@@ -13,8 +12,7 @@ from redash.monitor import get_status
 
 #######################这样可以#######################
 def foo():
-     """132132132"""
-
+    """132132132"""
 
 
 def create(group):
@@ -23,6 +21,7 @@ def create(group):
 
     @app.shell_context_processor
     def shell_context():
+        ##shell 通常 包含数据库的Model模型
         from redash import models
         return dict(models=models)
 
@@ -30,8 +29,10 @@ def create(group):
 
 
 # https://isudox.com/2016/09/03/learning-python-package-click/
- cls(name=name or f.__name__.lower(),
-               callback=f, params=params, **attrs)
+
+
+# 实际执行的是这个
+# FlaskGroup(manager,create_app)
 
 # @click.group 装饰器把方法装饰为
 # 可以拥有多个子命令的 Group 对象
@@ -41,12 +42,21 @@ def manager():
     """Management script for Redash"""
 
 
+################数据库操作###############
 manager.add_command(database.manager, "database")
+
+##############################
 manager.add_command(users.manager, "users")
 manager.add_command(groups.manager, "groups")
 manager.add_command(data_sources.manager, "ds")
 manager.add_command(organization.manager, "org")
+manager.add_command(users.manager, "users")
+##############################
+
+
+###内置的runserver命令
 manager.add_command(run_command, "runserver")
+
 
 # 也可以直接用 @Group.command 装饰方法，会自动把方法关联到该 Group 对象下。
 @manager.command()
@@ -55,11 +65,15 @@ def version():
     print(__version__)
 
 
+
+################应用状态################
 @manager.command()
 def status():
     print(json.dumps(get_status(), indent=2))
 
 
+
+################配置检查################
 @manager.command()
 def check_settings():
     """Show the settings as Redash sees them (useful for debugging)."""
@@ -67,6 +81,7 @@ def check_settings():
         print("{} = {}".format(name, item))
 
 
+################测试邮件服务器################
 @manager.command()
 @click.argument('email', default=settings.MAIL_DEFAULT_SENDER, required=False)
 def send_test_mail(email=None):
