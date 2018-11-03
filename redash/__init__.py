@@ -104,7 +104,8 @@ mail.init_mail(settings.all_settings())
 
 
 ############################################
-## 项目运行后的数据采集
+## 收集各种指标
+# 指标metrics指的就是各种，随时间变化可度量的值
 statsd_client = StatsClient(host=settings.STATSD_HOST, port=settings.STATSD_PORT, prefix=settings.STATSD_PREFIX)
 ##############################################
 
