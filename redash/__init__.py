@@ -20,6 +20,11 @@ from werkzeug.routing import BaseConverter
 # 入口文件指定版本号,是个好习惯
 __version__ = '5.0.0-beta'
 
+# 线上现在是
+# __version__ = '6.0.0-beta'
+# 说明是个大版本了，不兼容
+
+
 
 def setup_logging():
     handler = logging.StreamHandler(sys.stdout if settings.LOG_STDOUT else sys.stderr)
