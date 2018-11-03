@@ -63,7 +63,6 @@ def create_redis_connection():
 # 配置日志文件
 setup_logging()
 
-
 # 连接Nosql
 redis_connection = create_redis_connection()
 mail = Mail()
@@ -77,10 +76,13 @@ import_destinations(settings.DESTINATIONS)
 
 # https://www.zhihu.com/question/19887316
 #######
- # version_check 是 redash包内的文件, from redash import __version__ as current_version
- # redash包又从version_check导入  reset_new_version_status,  from redash.version_check import reset_new_version_status
- # 产生了循环导入
- # 置后
+# redash包从version_check导入reset_new_version_status,  from redash.version_check import reset_new_version_status
+# version_check模块从redash包导入current_version, from redash import __version__ as current_version
+# 产生了循环导入,相互依赖
+
+# import本质也是执行指令，如果导入reset_new_version_status放到__version__ = '5.0.0-beta'前面，
+# 执行 from redash.version_check import reset_new_version_status的时候
+# version_check(首次进入sys.module)初始化时，执行到 from redash import __version__ as current_version,会导入不仅current_version，因为还没定义
 from redash.version_check import reset_new_version_status
 
 reset_new_version_status()
@@ -109,12 +111,10 @@ def create_app(load_admin=True):
     from redash.authentication import setup_authentication
     from redash.metrics.request import provision_app
 
-
     # https: // www.v2ex.com / t / 289972
 
-    #创建 flask 对象时候，是需要传一个模块一般是__name__过去，你改下就行了，那个是被当作根地址,确定了template位置
-    #也可以在蓝图的时候指定
-
+    # 创建 flask 对象时候，是需要传一个模块一般是__name__过去，你改下就行了，那个是被当作根地址,确定了template位置
+    # 也可以在蓝图的时候指定
 
     app = Flask(__name__,
                 # 指定静态文件目录
@@ -128,8 +128,6 @@ def create_app(load_admin=True):
     # Make sure we get the right referral address even behind proxies like nginx.
     # 难点。。。。
     app.wsgi_app = ProxyFix(app.wsgi_app, settings.PROXIES_COUNT)
-
-
 
     #  定制url
     app.url_map.converters['org_slug'] = SlugConverter
