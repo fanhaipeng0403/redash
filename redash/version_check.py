@@ -49,7 +49,19 @@ def get_latest_version():
 
 
 def _compare_and_update(latest_version):
-    # TODO: support alpha channel (allow setting which channel to check & parse build number)
+    # http://taobaofed.org/blog/2016/08/05/instructions-of-semver/
+    # Semantic Versioning, 语义化版本
+    # semver
+
+    #常规版本号
+    # 0.1.0
+    # 大版本（不兼容），小版本（向后兼容），修订（一些小更新）
+
+    # 预发版本号
+    # "1.0.0-beta.1"< stage > 一般选用：alpha、beta、rc。
+
+    # 因此在版本的大小比较上，仍然先比较常规版本号部分；对于预发标记部分的比较，则是根据 ASCII 字母表中的顺序来进行。
+
     is_newer = semver.compare(current_version, latest_version) == -1
     logging.info("Latest version: %s (newer: %s)", latest_version, is_newer)
 

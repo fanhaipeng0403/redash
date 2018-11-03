@@ -45,7 +45,7 @@ CLI to manage redash.
 
 
 
-# 这里添加一些感悟
+# import导入机制
 
 # import 'xxxxx'
 # 'xxxx' 模块里的代码将执行
@@ -53,7 +53,7 @@ CLI to manage redash.
 # 再次import 'xxxxx'
 # 'xxxx' 模块里的代码将不再执行
 
-
+# https://zhuanlan.zhihu.com/p/29883945
 
 
 
