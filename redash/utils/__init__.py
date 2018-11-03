@@ -66,6 +66,9 @@ def generate_token(length):
     return ''.join(rand.choice(chars) for x in range(length))
 
 
+##########################################################################################################################################
+# 自定义json转换
+
 class JSONEncoder(json.JSONEncoder):
     """Custom JSON encoding class, to handle Decimal and datetime.date instances."""
 
@@ -88,6 +91,7 @@ class JSONEncoder(json.JSONEncoder):
 def json_dumps(data):
     return json.dumps(data, cls=JSONEncoder)
 
+##########################################################################################################################################
 
 def build_url(request, host, path):
     parts = request.host.split(':')

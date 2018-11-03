@@ -43,6 +43,20 @@ CLI to manage redash.
 #  因此当执行 from redash.cli import manager的时候
 # redash 的__init__和cli的___init__的代码都会执行
 
+
+
+# 这里添加一些感悟
+
+# import 'xxxxx'
+# 'xxxx' 模块里的代码将执行
+# 'xxxx' 模块进入 sys.module
+# 再次import 'xxxxx'
+# 'xxxx' 模块里的代码将不再执行
+
+
+
+
+
 from redash.cli import manager
 
 if __name__ == '__main__':

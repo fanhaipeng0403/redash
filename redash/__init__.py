@@ -75,6 +75,12 @@ limiter = Limiter(key_func=get_ipaddr, storage_uri=settings.LIMITER_STORAGE)
 import_query_runners(settings.QUERY_RUNNERS)
 import_destinations(settings.DESTINATIONS)
 
+# https://www.zhihu.com/question/19887316
+#######
+ # version_check 是 redash包内的文件, from redash import __version__ as current_version
+ # redash包又从version_check导入  reset_new_version_status,  from redash.version_check import reset_new_version_status
+ # 产生了循环导入
+ # 置后
 from redash.version_check import reset_new_version_status
 
 reset_new_version_status()
