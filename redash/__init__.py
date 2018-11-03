@@ -1,19 +1,46 @@
+######################软件日志#####################
 import logging
+
 import sys
 import urllib
 
+
+################缓存数据库#######################
 import redis
 import urlparse
+
+
+
+########################Web框架#################
 from flask import Flask
-from flask_limiter import Limiter
+
+
+
+########################W插件#################
 from flask_limiter.util import get_ipaddr
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sslify import SSLify
+from flask_limiter import Limiter
+
+
+########################项目配置#################
 from redash import settings
+
+
+
+######任务队列#################################
 from redash.destinations import import_destinations
 from redash.query_runner import import_query_runners
+
+
+
 from statsd import StatsClient
+
+
+
+#####定制服务器######
+
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.routing import BaseConverter
 
@@ -73,7 +100,16 @@ redis_connection = create_redis_connection()
 mail = Mail()
 migrate = Migrate()
 mail.init_mail(settings.all_settings())
+
+
+
+############################################
+## 项目运行后的数据采集
 statsd_client = StatsClient(host=settings.STATSD_HOST, port=settings.STATSD_PORT, prefix=settings.STATSD_PREFIX)
+##############################################
+
+
+
 limiter = Limiter(key_func=get_ipaddr, storage_uri=settings.LIMITER_STORAGE)
 
 import_query_runners(settings.QUERY_RUNNERS)
@@ -139,6 +175,9 @@ def create_app(load_admin=True):
 
     # 根据setting文件配置
     if settings.ENFORCE_HTTPS:
+        # https: // www.helplib.com / GitHub / article_82448
+        # 所有的http重定向为https
+        # 什么时候使用 ??????????????????????
         SSLify(app, skips=['ping'])
 
     # 异常警报和通知处理
