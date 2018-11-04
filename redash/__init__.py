@@ -1,56 +1,37 @@
 ######################软件日志#####################
 import logging
-
 import sys
 import urllib
-
 
 ################缓存数据库#######################
 import redis
 import urlparse
-
-
-
 ########################Web框架#################
 from flask import Flask
-
-
-
+from flask_limiter import Limiter
 ########################W插件#################
 from flask_limiter.util import get_ipaddr
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sslify import SSLify
-from flask_limiter import Limiter
-
-
 ########################项目配置#################
 from redash import settings
-
-
-
 ######任务队列#################################
 from redash.destinations import import_destinations
 from redash.query_runner import import_query_runners
-
-
-
 from statsd import StatsClient
-
-
-
-#####定制服务器######
-
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.routing import BaseConverter
+
+#####定制服务器######
 
 # 入口文件指定版本号,是个好习惯
 __version__ = '5.0.0-beta'
 
+
 # 线上现在是
 # __version__ = '6.0.0-beta'
 # 说明是个大版本了，不兼容
-
 
 
 def setup_logging():
@@ -101,8 +82,6 @@ mail = Mail()
 migrate = Migrate()
 mail.init_mail(settings.all_settings())
 
-
-
 ############################################
 ## 收集各种指标
 # 指标metrics指的就是各种，随时间变化可度量的值
@@ -110,11 +89,29 @@ statsd_client = StatsClient(host=settings.STATSD_HOST, port=settings.STATSD_PORT
 ##############################################
 
 
-
 limiter = Limiter(key_func=get_ipaddr, storage_uri=settings.LIMITER_STORAGE)
 
+#################
+# Python中所有加载到内存的模块都放在sys.modules。
+# 当import一个模块时首先会在这个列表中查找是否已经加载了此模块，如果加载了则只是将模块的名字加入到正在调用import的模块的Local名字空间中。
+# 如果没有加载则从sys.path目录中按照模块名称查找模块文件，模块文件可以是py、pyc、pyd，找到后将模块载入内存，并加入到sys.modules中，并将名称导入到当前的Local名字空间。
+
+# 利用import首次导入时候的初始化,执行了
+# register(BigQuery)
+# register(BigQueryGCE)
+
+# 我觉得还是导入进来这个函数，
+# 然后手动register()更好????
+
+
 import_query_runners(settings.QUERY_RUNNERS)
+# 'redash.query_runner.memsql_ds',
+# 'redash.query_runner.athena',
+# 'redash.query_runner.big_query',
+
+
 import_destinations(settings.DESTINATIONS)
+#################
 
 # https://www.zhihu.com/question/19887316
 #######

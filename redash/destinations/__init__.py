@@ -57,7 +57,7 @@ def register(destination_class):
     global destinations
     if destination_class.enabled():
         logger.debug("Registering %s (%s) destinations.", destination_class.name(), destination_class.type())
-        destinations[destination_class.type()] = destination_class 
+        destinations[destination_class.type()] = destination_class
     else:
         logger.warning("%s destination enabled but not supported, not registering. Either disable or install missing dependencies.", destination_class.name())
 
@@ -78,5 +78,7 @@ def get_configuration_schema_for_destination_type(destination_type):
 
 
 def import_destinations(destination_imports):
+    # __import__() 函数用于动态加载类和函数 。 如果一个模块经常变化就可以使用
+    # 也可以使用importlib模块的import_module函数。
     for destination_import in destination_imports:
         __import__(destination_import)

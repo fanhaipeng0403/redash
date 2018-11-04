@@ -176,4 +176,8 @@ def get_configuration_schema_for_query_runner_type(query_runner_type):
 
 def import_query_runners(query_runner_imports):
     for runner_import in query_runner_imports:
+        # __import__() 函数用于动态加载类和函数 。 如果一个模块经常变化就可以使用
+
+        #也可以使用importlib模块的import_module函数。
+
         __import__(runner_import)
