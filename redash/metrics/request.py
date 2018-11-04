@@ -1,6 +1,5 @@
 import logging
 import time
-from collections import namedtuple
 
 from flask import g, request
 from redash import statsd_client
@@ -13,7 +12,6 @@ def record_requets_start_time():
     # 任何情况下，无论如何这个返回值都会替换视图的返回值。
 
     # 如果 before_request() 上绑定的函数没有返回一个响应， 常规的请求处理将会生效，匹配的视图函数有机会返回一个响应。
-
     g.start_time = time.time()
 
 
@@ -87,3 +85,22 @@ def provision_app(app):
     # 注意销毁回调总是会被执行，即使没有请求前回调执行过，或是异常发生。类似于finally
     #
     app.teardown_request(calculate_metrics_on_exception)
+
+# https://www.jianshu.com/p/7a7efbb7205f
+
+# Flask中有四种请求hook，分别是@before_first_request @before_request @after_request @teardown_request
+# 除了request的请求上下文
+# 还存在应用上下文，current_app
+
+
+# 既然在 Web 应用运行时里，应用上下文 和 请求上下文 都是 Thread Local 的，那么为什么还要独立二者？
+# 查阅资料后发现第一个问题是因为设计初衷是为了能让两个以上的Flask应用共存在一个WSGI应用中，这样在请求中，需要通过应用上下文来获取当前请求的应用信息。
+
+
+# app context 是从 request context 中分离出来的，在 flask 0.7 以前只有 request context 没有 app context。之所以把 app context
+# 分离出来是因为有时只需要 app context （比如离线脚本）这时如果还要创建 request context 就会比较浪费资源以及时间。所以提供单独创建 app context 的功能。
+# 但是在实际的程序运行状态（app 的三种状态之一）
+# app context 和 request context 的生命周期是一样的：在请求开始时创建，在请求结束时销毁
+# 而 app context 却有点误导性，它的字面意思是 应用上下文，但它不是一直存在的，它只是request context 中的一个对 app 的代理(人)，
+# 所谓local proxy。它的作用主要是帮助 request 获取当前的应用，它是伴 request 而生，随 request 而灭的
+
