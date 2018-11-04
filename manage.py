@@ -14,7 +14,7 @@ CLI to manage redash.
 # import package, package.Module1
 
 
-# 2. 初始化包的行为
+# 2. 引用内部模块前的初始化。也可以，放置提供给内置模块的通用变量或函数等
 
 
 # graphics/

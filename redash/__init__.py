@@ -148,6 +148,16 @@ class SlugConverter(BaseConverter):
 # 3.celery的worker上下文集成
 # 4.测试test
 def create_app(load_admin=True):
+
+    # 1.redash的__init___文件包含了一些通用的函数或者变量
+    # 2.下面引入的模块使用了从这个模块导出的变量
+    # 3.这里又从这些模块，导入进来一些函数或者变量
+    # 4.形成了相互依赖
+    # 5.解决方案
+    # 6.调用置后于初始化的过程，比如requeset文件中的使用的 from redash import statsd_client 一定要在 from redash.metrics.request import provision_app前面
+    # 7.或者放入函数内部
+    # 8.保证首次进入sys.moudle的模块，已经包含了那些初始化的通用变量
+
     from redash import extensions, handlers
     from redash.handlers.webpack import configure_webpack
     from redash.handlers import chrome_logger
