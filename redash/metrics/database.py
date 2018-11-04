@@ -5,13 +5,16 @@ import time
 ####请求和应用上下文
 from flask import g, has_request_context
 
-
+# https://www.cnblogs.com/yasmi/p/5056089.html
+# http://www.xby1993.net/pages/dokuwiki/python/sqlalchemy.html
+# https://docs.sqlalchemy.org/en/latest/core/event.html?highlight=listen#sqlalchemy.event.listen
 
 ####记录工具
 from redash import statsd_client
 
 
 ######数据库监听
+
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm.util import _ORMJoin
@@ -32,7 +35,13 @@ def _table_name_from_select_element(elt):
     return t.name
 
 
+## 装饰器
 @listens_for(Engine, "before_execute")
+
+# 调用了这个方法
+# listen(target, identifier, fn, *args, **kw)
+# listen(Engine, ,before_execute,  'before_execute')
+
 def before_execute(conn, elt, multiparams, params):
     # setdefault
     # 有key存在，就返回key对应的值,
