@@ -158,6 +158,8 @@ def create_app(load_admin=True):
     # 7.或者放入函数内部
     # 8.保证首次进入sys.moudle的模块，已经包含了那些初始化的通用变量
 
+    # import语句中的 模块 包含了这个import语句所在模块的 依赖，那么这个import语句应该在这个依赖声明的后面
+
     from redash import extensions, handlers
     from redash.handlers.webpack import configure_webpack
     from redash.handlers import chrome_logger
