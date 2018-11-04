@@ -141,6 +141,12 @@ class SlugConverter(BaseConverter):
         return value
 
 
+
+###create_app用在了4个地方
+# 1.wsgi
+# 2.runserver 开发
+# 3.celery的worker上下文集成
+# 4.测试test
 def create_app(load_admin=True):
     from redash import extensions, handlers
     from redash.handlers.webpack import configure_webpack
