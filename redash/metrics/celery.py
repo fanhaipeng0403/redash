@@ -2,11 +2,18 @@ from __future__ import absolute_import
 
 import json
 import logging
+
+# https://gist.github.com/kevinkindom/108ffd675cb9253f8f71
+# celery是分布式的，获取worker的主机名
 import socket
+
 import time
 
-from celery.signals import task_postrun, task_prerun
 from redash import settings, statsd_client
+
+
+###################celery？？？？？？？？？？？？？？###############
+from celery.signals import task_postrun, task_prerun
 
 tasks_start_time = {}
 
@@ -35,6 +42,7 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
         run_time = 1000 * (time.time() - tasks_start_time.pop(task_id))
 
         state = (state or 'unknown').lower()
+        # 　　作用：获取当前主机的主机名；
         tags = {'state': state, 'hostname': socket.gethostname()}
         if task.name == 'redash.tasks.execute_query':
             if isinstance(retval, Exception):
@@ -45,8 +53,14 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
 
         normalized_task_name = task.name.replace('redash.tasks.', '').replace('.', '_')
         metric = "celery.task_runtime.{}".format(normalized_task_name)
+
         logging.debug("metric=%s", json.dumps({'metric': metric, 'tags': tags, 'value': run_time}))
+
         statsd_client.timing(metric_name(metric, tags), run_time)
         statsd_client.incr(metric_name('celery.task.{}.{}'.format(normalized_task_name, state), tags))
+
     except Exception:
         logging.exception("Exception during task_postrun handler.")
+
+
+

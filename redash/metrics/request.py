@@ -1,5 +1,6 @@
 import logging
 import time
+from collections import namedtuple
 
 from flask import g, request
 from redash import statsd_client
@@ -16,7 +17,7 @@ def record_requets_start_time():
 
 
 def calculate_metrics(response):
-    # 视图的返回值之后会被转换成一个实际的响应对象，并交给 #after_request() # 上绑定的函数适当地替换或修改它。
+
     if 'start_time' not in g:
         ####返还给客户端
         return response
@@ -62,7 +63,7 @@ def calculate_metrics(response):
 
 
 ####伪造一个请求
-# MockResponse = namedtuple('MockResponse', ['status_code', 'content_type', 'content_length'])
+MockResponse = namedtuple('MockResponse', ['status_code', 'content_type', 'content_length'])
 # 之所以使用，nametuple命名元组，是为了 response = MockResponse(500, '?', -1),  response.status_code可在calculate_metrics中兼容
 
 
