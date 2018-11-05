@@ -2,18 +2,15 @@ from __future__ import absolute_import
 
 import json
 import logging
-
 # https://gist.github.com/kevinkindom/108ffd675cb9253f8f71
 # celery是分布式的，获取worker的主机名
 import socket
-
 import time
 
-from redash import settings, statsd_client
-
-
-###################celery？？？？？？？？？？？？？？###############
+# https://blog.csdn.net/libing_thinking/article/details/78606458
+# 任务队列，分发，执行的整个流中，你可以连接到特定的信号，使得在他们触发的时候执行操作。
 from celery.signals import task_postrun, task_prerun
+from redash import settings, statsd_client
 
 tasks_start_time = {}
 
@@ -61,6 +58,3 @@ def task_postrun_handler(signal, sender, task_id, task, args, kwargs, retval, st
 
     except Exception:
         logging.exception("Exception during task_postrun handler.")
-
-
-
