@@ -76,6 +76,15 @@ def run_query_sync(data_source, parameter_values, query_text, max_age=0):
 
 # /user/<username>'
 # /post/<int:post_id>
+# /path/<path:subpath>  subpath的/不与url的/混淆
+
+
+###### 常用的转换
+# string	(default) accepts any text without a slash
+# int	accepts positive integers
+# float	accepts positive floating point values
+# path	like string but also accepts slashes
+# uuid	accepts UUID strings
 
 #######例子
 
@@ -127,6 +136,7 @@ def embed(query_id, visualization_id, org_slug=None):
         'query_id': query_id,
         'embed': True,
         'referer': request.headers.get('Referer')
+        # HTTP Referer是header的一部分，当浏览器向web服务器发送请求的时候，一般会带上Referer，告诉服务器我是从哪个页面链接过来的，服务器基此可以获得一些信息用于处理。
     })
 
     return render_index()
@@ -138,6 +148,8 @@ def public_dashboard(token, org_slug=None):
     if current_user.is_api_user():
         dashboard = current_user.object
     else:
+
+        # models.ApiKey.get_by_api_key(token)
         api_key = get_object_or_404(models.ApiKey.get_by_api_key, token)
         dashboard = api_key.object
 
@@ -149,4 +161,5 @@ def public_dashboard(token, org_slug=None):
         'headless': 'embed' in request.args,
         'referer': request.headers.get('Referer')
     })
+
     return render_index()

@@ -85,7 +85,7 @@ def require_fields(req, fields):
         if f not in req:
             abort(400)
 
-
+#####获得或者404 小工具
 def get_object_or_404(fn, *args, **kwargs):
     try:
         rv = fn(*args, **kwargs)

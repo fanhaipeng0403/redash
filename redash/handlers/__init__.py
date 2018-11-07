@@ -37,3 +37,17 @@ def init_app(app):
     api.init_app(app)
     # from flask_restful import Api
     # api是API的实例
+
+# 资源注册url路径的两种方式
+#  第一种
+#######################
+
+# >> @routes.route('/local_resource)
+# >> def resource():
+# >>     pass
+
+
+#  第二种
+#######################
+
+# >> resource.add_url_rule("/local_resource", endpoint")
