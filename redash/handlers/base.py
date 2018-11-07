@@ -1,18 +1,21 @@
+#########################
+# 这个模块放置,所有,基础的,通用的部件，给handler包内的其他文件使用
+
+
 import time
-
 from inspect import isclass
-from flask import Blueprint, current_app, request
 
+from flask import Blueprint, current_app, request
 from flask_login import current_user, login_required
 from flask_restful import Resource, abort
 from redash import settings
 from redash.authentication import current_org
-from redash.models import ApiUser, db
+from redash.models import db
 from redash.tasks import record_event as record_event_task
 from redash.utils import json_dumps
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy import cast, select, String
+from sqlalchemy import cast
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy_utils import sort_query
 
 routes = Blueprint('redash', __name__, template_folder=settings.fix_assets_path('templates'))
@@ -38,6 +41,8 @@ class BaseResource(Resource):
     def current_org(self):
         return current_org._get_current_object()
 
+    # 请求记录器, 用于FLASK_RESTFUL API
+
     def record_event(self, options):
         record_event(self.current_org, self.current_user, options)
 
@@ -45,6 +50,10 @@ class BaseResource(Resource):
     def update_model(self, model, updates):
         for k, v in updates.items():
             setattr(model, k, v)
+
+    # 请求记录器, 用于传统的url请求
+    #  用户自定义埋点？？？
+    # 记录 用户的的user_id，组织，访问的页面，动作，client相关信息
 
 
 def record_event(org, user, options):
@@ -130,7 +139,7 @@ def filter_by_tags(result_set, column):
     if request.args.getlist('tags'):
         tags = request.args.getlist('tags')
         result_set = result_set.filter(cast(column, postgresql.ARRAY(db.Text)).contains(tags))
-    
+
     return result_set
 
 

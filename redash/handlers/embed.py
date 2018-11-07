@@ -1,11 +1,10 @@
 from __future__ import absolute_import
+
 import logging
 import time
 
 import pystache
 from flask import request
-
-from .authentication import current_org
 from flask_login import current_user, login_required
 from flask_restful import abort
 from redash import models, utils
@@ -15,6 +14,8 @@ from redash.handlers.base import (get_object_or_404, org_scoped_rule,
 from redash.handlers.query_results import collect_query_parameters
 from redash.handlers.static import render_index
 from redash.utils import gen_query_hash
+
+from .authentication import current_org
 
 
 #
@@ -66,9 +67,59 @@ def run_query_sync(data_source, parameter_values, query_text, max_age=0):
         return None
 
 
+######## url的参数规范：
+
+# ?后面加参数， mode=job ， 不同参数与之间使用&，action=update&jobid=1
+# http://127.0.0.1:888/api?model=job&action=update&jobid=1
+
+######## flask的url特色
+
+# /user/<username>'
+# /post/<int:post_id>
+
+#######例子
+
+# >>> from flask import Flask, url_for
+# >>> app = Flask(__name__)
+# >>> @app.route('/')
+# ... def index(): pass
+# ...
+# >>> @app.route('/login')
+# ... def login(): pass
+# ...
+# >>> @app.route('/user/<username>')
+# ... def profile(username): pass
+# ...
+# >>> with app.test_request_context():
+# ...  print url_for('index')
+# ...  print url_for('login')
+# ...  print url_for('login', next='/')
+# ...  print url_for('profile', username='John Doe', job='teacher')
+# ...
+# /
+# /login
+# /login?next=/
+# /user/John%20Doe?job=teacher        （内填充进flask的<>参数里，就 填充，不能则使用标准的url规范）
+
+# org_scoped_rule, 组织域规则
 @routes.route(org_scoped_rule('/embed/query/<query_id>/visualization/<visualization_id>'), methods=['GET'])
+# /<org_slug:org_slug>/embed/query/<query_id>/visualization/<visualization_id>
+# 或
+# /embed/query/<query_id>/visualization/<visualization_id>
+
 @login_required
 def embed(query_id, visualization_id, org_slug=None):
+    # record_event
+    # 所有的请求相关信息都会被记录
+
+    # id   org_id user_id   action              object_type   created_at
+    # 1     1       1        login           personal_homepage   05/10/18:11:50
+
+    # object_id additional_properties
+
+    # {"ip": "13.124.223.158",
+    #  "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36"}
+
     record_event(current_org, current_user._get_current_object(), {
         'action': 'view',
         'object_id': visualization_id,
