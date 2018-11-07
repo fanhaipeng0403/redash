@@ -145,8 +145,10 @@ def logout(org_slug=None):
     return redirect(get_login_url(next=None))
 
 
+####################反倒base.py更好？
 def base_href():
     if settings.MULTI_ORG:
+        # _external  返回完整的路径
         base_href = url_for('redash.index', _external=True, org_slug=current_org.slug)
     else:
         base_href = url_for('redash.index', _external=True)

@@ -5,8 +5,10 @@ from redash import settings
 from redash.handlers.authentication import base_href
 from redash.handlers.base import org_scoped_rule, routes
 
+
 ###  app.send_static_file
 ###  app.send_static_file 发送静态文件
+
 # >>>>@app.route("/download/<filepath>", methods=['GET'])
 # >>>> def download_file(filepath):
 #     此处的filepath是文件的路径，但是文件必须存储在static文件夹下， 比如images\test.jpg
@@ -14,7 +16,18 @@ from redash.handlers.base import org_scoped_rule, routes
 
 def render_index():
     if settings.MULTI_ORG:
+        # base_href ,项目的完整根路径
+
+        # base_href = url_for('redash.index', _external=True)
+
         response = render_template("multi_org.html", base_href=base_href())
+
+        # base标签
+
+        # 我们设置base标签，给一个基准href，那么其他的链接都是以此为基准
+
+        # < base href = "{{base_href}}" >
+
     else:
 
         #  path =  directory + filename

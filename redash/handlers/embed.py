@@ -105,10 +105,17 @@ def run_query_sync(data_source, parameter_values, query_text, max_age=0):
 # ...  print url_for('login', next='/')
 # ...  print url_for('profile', username='John Doe', job='teacher')
 # ...
+
+
+
 # /
 # /login
 # /login?next=/
 # /user/John%20Doe?job=teacher        （内填充进flask的<>参数里，就 填充，不能则使用标准的url规范）
+
+# 注意：
+# 加上_external=True 将返回完整的路径
+
 
 # org_scoped_rule, 组织域规则
 @routes.route(org_scoped_rule('/embed/query/<query_id>/visualization/<visualization_id>'), methods=['GET'])
