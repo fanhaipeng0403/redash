@@ -74,6 +74,7 @@ def create_redis_connection():
 
 
 # 配置日志文件
+# https://cuiqingcai.com/6080.html
 setup_logging()
 
 # 连接Nosql
