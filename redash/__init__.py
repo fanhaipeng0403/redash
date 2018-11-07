@@ -43,6 +43,7 @@ def setup_logging():
 
     # Make noisy libraries less noisy
     if settings.LOG_LEVEL != "DEBUG":
+        # 所有的程序模块公用一个logging，即使依赖文件，也会写入文件'
         logging.getLogger("passlib").setLevel("ERROR")
         logging.getLogger("requests.packages.urllib3").setLevel("ERROR")
         logging.getLogger("snowflake.connector").setLevel("ERROR")
