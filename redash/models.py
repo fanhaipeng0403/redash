@@ -951,11 +951,22 @@ class Query(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model):
 ## 关联依据，foreignKey， 以及关联法则, relationship
 
     # 外键存在于真实的数据库，是sqlalchemy表对象和其他表对象，关联起来的依据
-    ## 外键一般存在于，字表？？？？？, 多对一中的多？？
+    # 一般位于从表中
 
     # relationship， 规定了表对象之间处理的约束, relationship好多参数~~~~~~~~~~~~~
     ## 关系是相互的，放在哪个表里？？？？？？？
 
+
+    # 外键约束？？？？？？？？？？？？？？？？？？？？？？？？？
+
+# MYSQL 层面的外键约束
+# 1. RESTRICT：父表数据被删除，会阻止删除。默认就是这一项。
+# 2. NO ACTION：在MySQL中，同RESTRICT。
+# 3. CASCADE：级联删除。
+# 4. SET NULL：父表数据被删除，子表数据会设置为NULL。
+# ORM层
+## CASCADE
+## ORM层面删除数据，会无视mysql级别的外键约束。直接会将对应的数据删除，然后将从表中的那个外键设置为NULL。如果想要避免这种行为，应该将从表中的外键的`nullable=False`。
     id = Column(db.Integer, primary_key=True)
 
     version = Column(db.Integer, default=1)
