@@ -566,7 +566,11 @@ class DataSource(BelongsToOrgMixin, db.Model):
     scheduled_queue_name = Column(db.String(255), default="scheduled_queries")
     created_at = Column(db.DateTime(True), default=db.func.now())
 
+    # back_polulates
+    # 这个参数和backref的区别是只提供单向的关系引用，且必须成对存在，但是完成的功能和backref是一样的
+
     data_source_groups = db.relationship("DataSourceGroup", back_populates="data_source",
+
                                          cascade="all")
     __tablename__ = 'data_sources'
     __table_args__ = (db.Index('data_sources_org_id_name', 'org_id', 'name'),)
@@ -703,11 +707,23 @@ class DataSource(BelongsToOrgMixin, db.Model):
 
 class DataSourceGroup(db.Model):
     # XXX drop id, use datasource/group as PK
+    # id
+    # data_source_id
+    # group_id
+    # view_only
+    #
+
+
     id = Column(db.Integer, primary_key=True)
     data_source_id = Column(db.Integer, db.ForeignKey("data_sources.id"))
+
     data_source = db.relationship(DataSource, back_populates="data_source_groups")
+
     group_id = Column(db.Integer, db.ForeignKey("groups.id"))
+
     group = db.relationship(Group, back_populates="data_sources")
+
+
     view_only = Column(db.Boolean, default=False)
 
     __tablename__ = "data_source_groups"
@@ -755,7 +771,7 @@ class QueryResult(db.Model, BelongsToOrgMixin):
     # https://www.zhihu.com/question/38456789
     data_source = db.relationship(DataSource, backref=backref('query_results'))
      ##  允许反向调用。
-    ###  query_result.data_source (多对一）, 通常在，多的，这里是query_result 指明外键盘
+    ###  query_result.data_source (多对一）, 通常在, 在多的那个指明外键，如果一对一呢？？？
 
     ###  data_source.query_result(一对多）
 
