@@ -1,5 +1,8 @@
 
 
+# https://blog.csdn.net/u011402596/article/details/38510547
+
+# https://www.xncoding.com/2016/03/07/python/sqlalchemy02.html
 group_by = """"
 group_by分组与having再次过滤
 
