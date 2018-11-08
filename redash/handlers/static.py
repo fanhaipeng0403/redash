@@ -1,3 +1,6 @@
+###指定单页面应用的index.html
+
+
 from flask import render_template, safe_join, send_file
 
 from flask_login import login_required
@@ -37,13 +40,32 @@ def render_index():
         response = send_file(full_path, **dict(cache_timeout=0, conditional=True))
 
         # response = send_file(full_path, **dict(cache_timeout=0, conditional=True)), 直接渲染文件的内容到页面里.
-        #（为什么不用reader_template)，(可能不受template设置的项目路径的影响）
+        # （为什么不用reader_template)，(可能不受template设置的项目路径的影响）
 
         # response = send_file(full_path, as_attachment=True) 添加as_attachment=True的话， 将作为附件下载
 
     return response
 
 
+# >> from flask import Flask, render_template
+#
+# >>app = Flask(__name__, template_folder='./')
+#
+#
+# >>@app.route('/foo')
+# >>@app.route('/')
+# >>def foo():
+# >>    response = render_template("test.py")
+# >>    return response
+#
+#
+# >>>if __name__ == '__main__':
+#    app.run(debug=True)
+
+## /foo 和 / 都返回foo的响应
+
+
+####一个资源多个路由路径没问题！
 @routes.route(org_scoped_rule('/<path:path>'))
 # /<path:path>
 # /<org_slug:org_slug>/<path:path>

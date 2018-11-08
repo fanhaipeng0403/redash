@@ -3,6 +3,7 @@ from flask import Flask, render_template
 app = Flask(__name__, template_folder='./')
 
 
+@app.route('/foo')
 @app.route('/')
 def foo():
     response = render_template("test.py")
