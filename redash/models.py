@@ -238,6 +238,10 @@ class ChangeTrackingMixin(object):
                               change=changes))
 
 
+
+
+###########通过id或者user_id或者user_name，这样的标识，获取queryOne，最好封装成一个包含类方法，的类，用于复用
+
 class BelongsToOrgMixin(object):
     @classmethod
     def get_by_id_and_org(cls, object_id, org):

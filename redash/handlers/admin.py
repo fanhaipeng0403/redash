@@ -23,7 +23,7 @@ def outdated_queries():
 
 
         ###用的了 in_ 和 order_by 和 desc ， outerJoin
-        
+
         outdated_queries = (models.db.session.query(models.Query)
                             .outerjoin(models.QueryResult)
                             .filter(models.Query.id.in_(query_ids))
