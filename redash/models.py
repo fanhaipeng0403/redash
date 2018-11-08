@@ -737,13 +737,28 @@ class QueryResult(db.Model, BelongsToOrgMixin):
     # 实际上数据库层次并没这个og字段，这是ORM层，为了直接关联org queryOne的表达方式
 
     # 否则你要 db.session.query(Organization).filter(org_id = query_result.id)
-    # 现在只要， query_result.og 一下字就可以了
+    # 现在只要你只要查询出query_result,直接 query_result.og 一下字就可以了
+    # 有个疑问，我要反过来，直接查询出，og，  然后 og.query_result也这样省事的调用呢？？？见下面
+
+
+    # relationship函数是sqlalchemy对关系之间提供的一种便利的调用方式,
+    # https://www.zhihu.com/question/38456789
+
+
     # 再次重申也很 relationship ，数据库不包含此字段
 
 ##################################################################################################
 
     data_source_id = Column(db.Integer, db.ForeignKey("data_sources.id"))
+
+
+    # https://www.zhihu.com/question/38456789
     data_source = db.relationship(DataSource, backref=backref('query_results'))
+     ##  允许反向调用。
+    ###  query_result.data_source (多对一）, 通常在，多的，这里是query_result 指明外键盘
+
+    ###  data_source.query_result(一对多）
+
     ##### 与org字段同理，
 
 ##################################################################################################
