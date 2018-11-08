@@ -963,6 +963,7 @@ class Query(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model):
 # 1. RESTRICT：父表数据被删除，会阻止删除。默认就是这一项。
 # 2. NO ACTION：在MySQL中，同RESTRICT。
 # 3. CASCADE：级联删除。
+
 # 4. SET NULL：父表数据被删除，子表数据会设置为NULL。
 # ORM层
 ## CASCADE
