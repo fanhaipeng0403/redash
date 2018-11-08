@@ -5,7 +5,7 @@
 import time
 from inspect import isclass
 
-from flask import Blueprint, current_app, request
+from flask import Blueprint, current_app, request, jsonify
 from flask_login import current_user, login_required
 from flask_restful import Resource, abort
 from redash import settings
@@ -130,6 +130,14 @@ def org_scoped_rule(rule):
 
     return rule
 
+
+
+########################自定义flask的json类型response的转换#############
+# jsonify的源码
+
+    # return current_app.response_class( (dumps(data, indent=indent, separators=separators), '\n'),
+    #     mimetype=current_app.config['JSONIFY_MIMETYPE']
+    # )
 
 def json_response(response):
     return current_app.response_class(json_dumps(response), mimetype='application/json')

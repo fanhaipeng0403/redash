@@ -30,8 +30,9 @@ def status_api():
 # 项目http总注册接口，暴露给__init__.py的create_app使用
 def init_app(app):
     # 蓝图以及一些分散的接口
-    from redash.handlers import embed, queries, static, authentication, admin, setup, organization
-    app.register_blueprint(routes)
+    from redash.handlers import embed, queries, static, authentication, admin, setup, organization # 仅仅初始化？？
+
+    app.register_blueprint(routes) # 只注册了主的蓝图？？？
 
     ####总API注册入口
     api.init_app(app)
