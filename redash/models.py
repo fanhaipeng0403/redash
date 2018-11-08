@@ -1,3 +1,13 @@
+
+
+# DEBUG 技巧
+
+
+# PS:如果想要查看orm底层转换的sql语句，可以在filter方法后面不要再执行任何方法直接打印就可以看到了。比如,
+
+# articles = session.query(Article).filter(or_(Article.title=='abc',Article.content=='abc'))
+# print(articles)
+
 import csv
 import datetime
 import functools
@@ -318,6 +328,9 @@ class Organization(TimestampMixin, db.Model):
     #
 
     # https://www.xncoding.com/2016/03/07/python/sqlalchemy02.html
+
+
+                                                            #### 关联查询时候的排序
     events = db.relationship("Event", lazy="dynamic", order_by="desc(Event.created_at)", )
 
     __tablename__ = 'organizations'
@@ -933,29 +946,58 @@ def should_schedule_next(previous_iteration, now, schedule, failures):
 
 
 class Query(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model):
+
+
+## 关联依据，foreignKey， 以及关联法则, relationship
+
+    # 外键存在于真实的数据库，是sqlalchemy表对象和其他表对象，关联起来的依据
+    ## 外键一般存在于，字表？？？？？, 多对一中的多？？
+
+    # relationship， 规定了表对象之间处理的约束, relationship好多参数~~~~~~~~~~~~~
+    ## 关系是相互的，放在哪个表里？？？？？？？
+
     id = Column(db.Integer, primary_key=True)
+
     version = Column(db.Integer, default=1)
+
     org_id = Column(db.Integer, db.ForeignKey('organizations.id'))
     org = db.relationship(Organization, backref="queries")
+
     data_source_id = Column(db.Integer, db.ForeignKey("data_sources.id"), nullable=True)
     data_source = db.relationship(DataSource, backref='queries')
+
     latest_query_data_id = Column(db.Integer, db.ForeignKey("query_results.id"), nullable=True)
     latest_query_data = db.relationship(QueryResult)
+
     name = Column(db.String(255))
+
     description = Column(db.String(4096), nullable=True)
+
     query_text = Column("query", db.Text)
+
     query_hash = Column(db.String(32))
-    api_key = Column(db.String(40), default=lambda: generate_token(40))
+
+    api_key = Column(db.String(40), default=lambda: generate_token(40)) # default可以是个called的东西
+
     user_id = Column(db.Integer, db.ForeignKey("users.id"))
-    user = db.relationship(User, foreign_keys=[user_id])
+    user = db.relationship(User, foreign_keys=[user_id]) ###############################???????????????????????????
+
+
     last_modified_by_id = Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    last_modified_by = db.relationship(User, backref="modified_queries",
-                                       foreign_keys=[last_modified_by_id])
+    last_modified_by = db.relationship(User, backref="modified_queries", foreign_keys=[last_modified_by_id])
+
+
+
     is_archived = Column(db.Boolean, default=False, index=True)
+
     is_draft = Column(db.Boolean, default=True, index=True)
+
     schedule = Column(db.String(10), nullable=True)
+
     schedule_failures = Column(db.Integer, default=0)
+
     visualizations = db.relationship("Visualization", cascade="all, delete-orphan")
+
     options = Column(MutableDict.as_mutable(PseudoJSON), default={})
     search_vector = Column(TSVectorType('id', 'name', 'description', 'query',
                                         weights={'name': 'A',
@@ -966,11 +1008,14 @@ class Query(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model):
     tags = Column('tags', MutableList.as_mutable(postgresql.ARRAY(db.Unicode)), nullable=True)
 
     query_class = SearchBaseQuery
+
     __tablename__ = 'queries'
-    __mapper_args__ = {
-        "version_id_col": version,
-        'version_id_generator': False
-    }
+
+    # 默认排序
+    # __mapper_args__ = { "order_by":time.desc() }
+
+
+    __mapper_args__ = { "version_id_col": version, 'version_id_generator': False }
 
     def archive(self, user=None):
         db.session.add(self)
