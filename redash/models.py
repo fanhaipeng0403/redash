@@ -303,13 +303,21 @@ class Organization(TimestampMixin, db.Model):
     settings = Column(MutableDict.as_mutable(PseudoJSON))
     groups = db.relationship("Group", lazy="dynamic")
 
-# http://docs.jinkan.org/docs/flask-sqlalchemy/models.html
-# lazy 决定了 SQLAlchemy 什么时候从数据库中加载数据:
-# 'select' （默认值）意味着 SQLAlchemy 会在使用一个标准 select 语句 时一气呵成加载那些数据
-# 'joined' 让 SQLAlchemy 当父级使用 JOIN 语句是，在相同的查询中加 载关系。
-# 'subquery' 类似 'joined' ，但是 SQLAlchemy 会使用子查询。
-# 'dynamic' 在你有可能条目时是特别有用的。 SQLAlchemy 会返回另一个查 询对象，你可以在加载这些条目时进一步提取。如果不仅想要关系下的少量条目 时，这通常是你想要的。
+    # http://docs.jinkan.org/docs/flask-sqlalchemy/models.html
+    # lazy 决定了 SQLAlchemy 什么时候从数据库中加载数据:
 
+    # 'select' （默认值）意味着 SQLAlchemy 会在使用一个标准 select 语句 时一气呵成加载那些数据
+    # 'joined' 让 SQLAlchemy 当父级使用 JOIN 语句是，在相同的查询中加 载关系。
+    # 'subquery' 类似 'joined' ，但是 SQLAlchemy 会使用子查询。
+    # 'dynamic' 在你有可能条目时是特别有用的。 SQLAlchemy 会返回另一个查 询对象，你可以在加载这些条目时进一步提取。如果不仅想要关系下的少量条目 时，这通常是你想要的。
+
+    # class User(Base):
+    # addresses = relationship(lambda: Address,
+    #                          order_by=lambda: desc(Address.email),
+    #                          primaryjoin=lambda: Address.user_id == User.id)
+    #
+
+    # https://www.xncoding.com/2016/03/07/python/sqlalchemy02.html
     events = db.relationship("Event", lazy="dynamic", order_by="desc(Event.created_at)", )
 
     __tablename__ = 'organizations'
@@ -383,8 +391,10 @@ class Group(db.Model, BelongsToOrgMixin):
     REGULAR_GROUP = 'regular'
 
     id = Column(db.Integer, primary_key=True)
-    data_sources = db.relationship("DataSourceGroup", back_populates="group",
-                                   cascade="all")
+
+    # cascade =All 级联删除，父母表删除了，子女表的对应被删父母的行，也会被删除，否则是设为null
+    data_sources = db.relationship("DataSourceGroup", back_populates="group", cascade="all")
+
     org_id = Column(db.Integer, db.ForeignKey('organizations.id'))
     org = db.relationship(Organization, back_populates="groups")
     type = Column(db.String(255), default=REGULAR_GROUP)
@@ -721,7 +731,6 @@ class DataSourceGroup(db.Model):
     # view_only
     #
 
-
     id = Column(db.Integer, primary_key=True)
     data_source_id = Column(db.Integer, db.ForeignKey("data_sources.id"))
 
@@ -730,7 +739,6 @@ class DataSourceGroup(db.Model):
     group_id = Column(db.Integer, db.ForeignKey("groups.id"))
 
     group = db.relationship(Group, back_populates="data_sources")
-
 
     view_only = Column(db.Boolean, default=False)
 
@@ -753,10 +761,10 @@ class QueryResult(db.Model, BelongsToOrgMixin):
 
     id = Column(db.Integer, primary_key=True)  # 主键
 
-########################################################################################################
+    ########################################################################################################
     # organizations 默认为Class的小写名
-    org_id = Column(db.Integer, db.ForeignKey('organizations.id'))  # ORM层的外键, 外键通常为，其他表，除了id外，行的标识
-    org = db.relationship(Organization)                             # 行的名称，或者说资源的名称
+    org_id = Column(db.Integer, db.ForeignKey('organizations.id'))  # ORM层的外键, 键， 顾名思义， 是像id ，user_id ,user_name . 这样确定行标识的东西
+    org = db.relationship(Organization)  # 行的名称，或者说资源的名称
     ### 见上面的列出的字段,你会发现
     # 实际上数据库层次并没这个og字段，这是ORM层，为了直接关联org queryOne的表达方式
 
@@ -764,28 +772,25 @@ class QueryResult(db.Model, BelongsToOrgMixin):
     # 现在只要你只要查询出query_result,直接 query_result.og 一下字就可以了
     # 有个疑问，我要反过来，直接查询出，og，  然后 og.query_result也这样省事的调用呢？？？见下面
 
-
     # relationship函数是sqlalchemy对关系之间提供的一种便利的调用方式,
     # https://www.zhihu.com/question/38456789
 
-
     # 再次重申也很 relationship ，数据库不包含此字段
 
-##################################################################################################
+    ##################################################################################################
 
     data_source_id = Column(db.Integer, db.ForeignKey("data_sources.id"))
 
-
     # https://www.zhihu.com/question/38456789
     data_source = db.relationship(DataSource, backref=backref('query_results'))
-     ##  允许反向调用。
+    ##  允许反向调用。
     ###  query_result.data_source (多对一）, 通常在, 在多的那个指明外键，如果一对一呢？？？
 
     ###  data_source.query_result(一对多）
 
     ##### 与org字段同理，
 
-##################################################################################################
+    ##################################################################################################
 
     query_hash = Column(db.String(32), index=True)
 

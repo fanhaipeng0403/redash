@@ -24,6 +24,8 @@ def outdated_queries():
 
         ###用的了 in_ 和 order_by 和 desc ， outerJoin
 
+        #https://www.xncoding.com/2016/03/07/python/sqlalchemy02.html
+        #外键就一个，系统知道如何去关联
         outdated_queries = (models.db.session.query(models.Query)
                             .outerjoin(models.QueryResult)
                             .filter(models.Query.id.in_(query_ids))
