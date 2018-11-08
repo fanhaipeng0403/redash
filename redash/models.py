@@ -1,5 +1,18 @@
 
 
+group_by = """"
+group_by分组与having再次过滤
+
+1.根据某个字段进行分组。比如想要根据性别进行分组，来统计每个分组分别有多少人，那么可以使用以下代码来完成：
+
+session.query(User.gender,func.count(User.id)).group_by(User.gender).all()
+2.having是对查找结果进一步过滤。比如只想要看未成年人的数量，那么可以首先对年龄进行分组统计人数，然后再对分组进行having过滤。示例代码如下：
+
+
+result = session.query(User.age,func.count(User.id)).group_by(User.age).having(User.age >= 18).all()
+
+"""
+
 # DEBUG 技巧
 
 
@@ -1476,6 +1489,26 @@ class Dashboard(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model
     dashboard_filters_enabled = Column(db.Boolean, default=False)
     is_archived = Column(db.Boolean, default=False, index=True)
     is_draft = Column(db.Boolean, default=True, index=True)
+
+
+    tips = """
+    八、懒加载(是查询对象，还是默认, 查询对象.all()) 
+
+    在一对多，或者多对多的时候，如果想要获取多的这一部分的数据的时候，往往能通过一个属性就可以全部获取了。
+    比如有一个作者，想要或者这个作者的所有文章，那么可以通过user.articles就可以获取所有的。但有时候我们不想获取所有的数据，
+    比如只想获取这个作者今天发表的文章，那么这时候我们可以给relationship传递一个lazy = 'dynamic'，以后通过user.articles获取到的就不是一个列表，
+    而是一个AppenderQuery对象了。这样就可以对这个对象再进行一层过滤和排序等操作。
+    通过 `lazy = 'dynamic'
+    
+    `，获取出来的多的那一部分的数据，就是一个 `AppenderQuery`
+    对象了。这种对象既可以添加新数据，也可以跟 `Query` 一样，可以再进行一层过滤。
+    总而言之一句话：如果你在获取数据的时候，想要对多的那一边的数据再进行一层过滤，那么这时候就可以考虑使用 `lazy = 'dynamic' `。
+
+
+    """
+
+
+
     widgets = db.relationship('Widget', backref='dashboard', lazy='dynamic')
     tags = Column('tags', MutableList.as_mutable(postgresql.ARRAY(db.Unicode)), nullable=True)
 
