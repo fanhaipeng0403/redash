@@ -38,7 +38,7 @@ def init_app(app):
     # from flask_restful import Api
     # api是API的实例
 
-# 路由, 资源注册url的两种方式
+# 路由注册, 资源注册url的两种方式
 #  第一种
 #######################
 

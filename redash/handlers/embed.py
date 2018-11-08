@@ -113,6 +113,10 @@ def run_query_sync(data_source, parameter_values, query_text, max_age=0):
 # /login?next=/
 # /user/John%20Doe?job=teacher        （内填充进flask的<>参数里，就 填充，不能则使用标准的url规范）
 
+#  格式
+#  /user/John%20Doe' == 'user=Jhon%20Doe
+
+
 # 注意：
 # 加上_external=True 将返回完整的路径
 
