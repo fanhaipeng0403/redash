@@ -50,9 +50,11 @@ class SQLAlchemyExt(SQLAlchemy):
             return super(SQLAlchemyExt, self).apply_pool_defaults(app, options)
 
 
+############ db 是 flask sqlachemy的类的实例
 db = SQLAlchemyExt(session_options={
     'expire_on_commit': False
 })
+
 # Make sure the SQLAlchemy mappers are all properly configured first.
 # This is required by SQLAlchemy-Searchable as it adds DDL listeners
 # on the configuration phase of models.

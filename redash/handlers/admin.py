@@ -2,6 +2,8 @@ import json
 
 from flask import request
 from flask_login import login_required
+###
+# from redash import models  直接引入的模块？？？
 from redash import models, redis_connection
 from redash.handlers import routes
 from redash.handlers.base import json_response
@@ -13,9 +15,14 @@ from redash.tasks.queries import QueryTaskTracker
 @require_super_admin
 @login_required
 def outdated_queries():
-    manager_status = redis_connection.hgetall('redash:status')
-    query_ids = json.loads(manager_status.get('query_ids', '[]'))
+    ### redis-----hash get all
+    manager_status = redis_connection.hgetall('redash:status') # "Return a Python dict of the hash's name/value pairs"
+    query_ids = json.loads(manager_status.get('query_ids', '[]')) # redis Hash结构里 嵌套了一个list，被json序列化为了字符串
+
     if query_ids:
+
+
+        ###用的了 in_ 和 order_by 和 desc ， outerJoin
         outdated_queries = (models.db.session.query(models.Query)
                             .outerjoin(models.QueryResult)
                             .filter(models.Query.id.in_(query_ids))
@@ -33,7 +40,7 @@ def outdated_queries():
 @require_super_admin
 @login_required
 def queries_tasks():
-    global_limit = request.args.get('limit', 50 ,type=int)
+    global_limit = request.args.get('limit', 50, type=int)
     waiting_limit = int(request.args.get('waiting_limit', global_limit))
     progress_limit = int(request.args.get('progress_limit', global_limit))
     done_limit = int(request.args.get('done_limit', global_limit))
@@ -48,4 +55,5 @@ def queries_tasks():
         'done': [t.data for t in done if t is not None]
     }
 
+    # 直接丢入字典即可
     return json_response(response)
