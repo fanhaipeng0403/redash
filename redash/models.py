@@ -302,6 +302,14 @@ class Organization(TimestampMixin, db.Model):
     slug = Column(db.String(255), unique=True)
     settings = Column(MutableDict.as_mutable(PseudoJSON))
     groups = db.relationship("Group", lazy="dynamic")
+
+# http://docs.jinkan.org/docs/flask-sqlalchemy/models.html
+# lazy 决定了 SQLAlchemy 什么时候从数据库中加载数据:
+# 'select' （默认值）意味着 SQLAlchemy 会在使用一个标准 select 语句 时一气呵成加载那些数据
+# 'joined' 让 SQLAlchemy 当父级使用 JOIN 语句是，在相同的查询中加 载关系。
+# 'subquery' 类似 'joined' ，但是 SQLAlchemy 会使用子查询。
+# 'dynamic' 在你有可能条目时是特别有用的。 SQLAlchemy 会返回另一个查 询对象，你可以在加载这些条目时进一步提取。如果不仅想要关系下的少量条目 时，这通常是你想要的。
+
     events = db.relationship("Event", lazy="dynamic", order_by="desc(Event.created_at)", )
 
     __tablename__ = 'organizations'
