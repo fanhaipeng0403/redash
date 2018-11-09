@@ -1451,6 +1451,7 @@ class Alert(TimestampMixin, db.Model):
 
     @classmethod
     def all(cls, group_ids):
+        # joinedload=== leftjoin
         return db.session.query(Alert) \
             .options(joinedload(Alert.user), joinedload(Alert.query_rel)) \
             .join(Query) \
@@ -1777,13 +1778,15 @@ class NotificationDestination(BelongsToOrgMixin, db.Model):
 
 class AlertSubscription(TimestampMixin, db.Model):
     id = Column(db.Integer, primary_key=True)
+
+   ########################存在于数据表
     user_id = Column(db.Integer, db.ForeignKey("users.id"))
-    user = db.relationship(User)
-    destination_id = Column(db.Integer,
-                            db.ForeignKey("notification_destinations.id"),
-                            nullable=True)
-    destination = db.relationship(NotificationDestination)
     alert_id = Column(db.Integer, db.ForeignKey("alerts.id"))
+    destination_id = Column(db.Integer, db.ForeignKey("notification_destinations.id"), nullable=True)
+
+   ########################不存在于数据表 ,ORM处理关联
+    user = db.relationship(User)
+    destination = db.relationship(NotificationDestination)
     alert = db.relationship(Alert, back_populates="subscriptions")
 
     __tablename__ = 'alert_subscriptions'

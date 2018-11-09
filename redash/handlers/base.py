@@ -93,6 +93,9 @@ def require_fields(req, fields):
 
 
 #####获得或者404 小工具
+
+# AlertSubscription.query.get_or_404(subscriber_id)
+
 def get_object_or_404(fn, *args, **kwargs):
     try:
         rv = fn(*args, **kwargs)

@@ -68,6 +68,14 @@ class MyDataClass1(Base):
 
 if __name__ == '__main__':
 
+    def row_to_dict(row):
+        result = {}
+        for column in row.__table__.columns:
+            result[column.name] = getattr(row, column.name)
+
+        return result
+
+
     Base.metadata.create_all(engine)
     session = DBSession()
 
@@ -84,7 +92,11 @@ if __name__ == '__main__':
     # assert m1 in session.dirty
     session.commit()
 
-    # my_data= session.query(MyDataClass).filter_by(id=1).one()
+    my_data= session.query(MyDataClass1).filter_by(id=1).one()
+
+    print (row_to_dict(my_data))
+
+
     # a= my_data.data
     # print (type(a))
     # print (a)

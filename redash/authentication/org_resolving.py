@@ -22,4 +22,6 @@ current_org = LocalProxy(_get_current_org)
 
 
 # 将current_org弄成线程里的全局变量，并可以通过 current_org._get_current_object() 调用
-# current_user,flask-login 的源码可借鉴
+
+# current_user,flask-login 的源码类似
+# current_user = LocalProxy(lambda: _get_user())

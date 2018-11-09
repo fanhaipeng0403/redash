@@ -160,7 +160,18 @@ def serialize_widget(object):
     return d
 
 
+
+### full 显示外键关联数据表的数据, alert.user
+
 def serialize_alert(alert, full=True):
+
+    # def row_to_dict(row):
+    #     result = {}
+    #     for column in row.__table__.columns:
+    #         result[column.name] = getattr(row, column.name)
+    #
+    #     return result
+
     d = {
         'id': alert.id,
         'name': alert.name,
@@ -173,7 +184,10 @@ def serialize_alert(alert, full=True):
     }
 
     if full:
+        # 外键
         d['query'] = serialize_query(alert.query_rel)
+
+        # 外键
         d['user'] = alert.user.to_dict()
     else:
         d['query_id'] = alert.query_id
