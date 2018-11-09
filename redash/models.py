@@ -155,8 +155,12 @@ class GFKBase(object):
         self.object_id = value.id
 
 
-# XXX replace PseudoJSON and MutableDict with real JSON field
-class PseudoJSON(TypeDecorator):
+# XXX replace JSONEncodedDict and MutableDict with real JSON field
+
+
+########################################################################
+# 自定义字段类型
+class JSONEncodedDict(TypeDecorator):
     impl = db.Text
 
     def process_bind_param(self, value, dialect):
@@ -166,6 +170,9 @@ class PseudoJSON(TypeDecorator):
         if not value:
             return value
         return json.loads(value)
+
+# https://docs.sqlalchemy.org/en/latest/orm/extensions/mutable.html
+
 
 
 class MutableDict(Mutable, dict):
@@ -194,17 +201,24 @@ class MutableDict(Mutable, dict):
         dict.__delitem__(self, key)
         self.changed()
 
+#对实例无论怎么修改其json字段都无法正常保存到数据库中,目测应该是sqlalchemy没有检测到这个字段的变化而导致的。
+# 做如下的操作
+
 
 class MutableList(Mutable, list):
     def append(self, value):
         list.append(self, value)
+        ##################################################################手动触发监测
         self.changed()
 
     def remove(self, value):
         list.remove(self, value)
         self.changed()
+        ##################################################################手动触发监测
 
     @classmethod
+
+    # 强制将某个类型，转为定制类型
     def coerce(cls, key, value):
         if not isinstance(value, MutableList):
             if isinstance(value, list):
@@ -214,11 +228,18 @@ class MutableList(Mutable, list):
             return value
 
 
-class TimestampMixin(object):
-    updated_at = Column(db.DateTime(True), default=db.func.now(),
-                        onupdate=db.func.now(), nullable=False)
-    created_at = Column(db.DateTime(True), default=db.func.now(),
-                        nullable=False)
+########################################################################
+
+
+###############################################################################################################
+# 通用处理时间处理
+class TimestampMixin:
+    updated_at = Column(db.DateTime(True), default=db.func.now(), onupdate=db.func.now(), nullable=False)
+    created_at = Column(db.DateTime(True), default=db.func.now(), nullable=False)
+
+
+###############################################################################################################
+
 
 
 class ChangeTrackingMixin(object):
@@ -326,7 +347,10 @@ class Organization(TimestampMixin, db.Model):
     id = Column(db.Integer, primary_key=True)
     name = Column(db.String(255))
     slug = Column(db.String(255), unique=True)
-    settings = Column(MutableDict.as_mutable(PseudoJSON))
+
+    MutableDict.associate_with(JSONEncodedDict)
+
+    settings = Column(MutableDict.as_mutable(JSONEncodedDict))
     groups = db.relationship("Group", lazy="dynamic")
 
     # http://docs.jinkan.org/docs/flask-sqlalchemy/models.html
@@ -469,6 +493,9 @@ class User(TimestampMixin, db.Model, BelongsToOrgMixin, UserMixin, PermissionsCh
     _profile_image_url = Column('profile_image_url', db.String(320), nullable=True)
     password_hash = Column(db.String(128), nullable=True)
     # XXX replace with association table
+    # http://www.cnblogs.com/alianbog/p/5665411. html
+
+    #  list 用postgresql的Array， dict用自定义类型的Json
     group_ids = Column('groups', MutableList.as_mutable(postgresql.ARRAY(db.Integer)), nullable=True)
     api_key = Column(db.String(40),
                      default=lambda: generate_token(40),
@@ -1026,7 +1053,7 @@ class Query(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model):
 
     visualizations = db.relationship("Visualization", cascade="all, delete-orphan")
 
-    options = Column(MutableDict.as_mutable(PseudoJSON), default={})
+    options = Column(MutableDict.as_mutable(JSONEncodedDict), default={})
     search_vector = Column(TSVectorType('id', 'name', 'description', 'query',
                                         weights={'name': 'A',
                                                  'id': 'B',
@@ -1380,7 +1407,7 @@ class Change(GFKBase, db.Model):
     object_version = Column(db.Integer, default=0)
     user_id = Column(db.Integer, db.ForeignKey("users.id"))
     user = db.relationship(User, backref='changes')
-    change = Column(PseudoJSON)
+    change = Column(JSONEncodedDict)
     created_at = Column(db.DateTime(True), default=db.func.now())
 
     __tablename__ = 'changes'
@@ -1422,7 +1449,7 @@ class Alert(TimestampMixin, db.Model):
     query_rel = db.relationship(Query, backref=backref('alerts', cascade="all"))
     user_id = Column(db.Integer, db.ForeignKey("users.id"))
     user = db.relationship(User, backref='alerts')
-    options = Column(MutableDict.as_mutable(PseudoJSON))
+    options = Column(MutableDict.as_mutable(JSONEncodedDict))
     state = Column(db.String(255), default=UNKNOWN_STATE)
     subscriptions = db.relationship("AlertSubscription", cascade="all, delete-orphan")
     last_triggered_at = Column(db.DateTime(True), nullable=True)
@@ -1643,7 +1670,7 @@ class Event(db.Model):
     action = Column(db.String(255))
     object_type = Column(db.String(255))
     object_id = Column(db.String(255), nullable=True)
-    additional_properties = Column(MutableDict.as_mutable(PseudoJSON), nullable=True, default={})
+    additional_properties = Column(MutableDict.as_mutable(JSONEncodedDict), nullable=True, default={})
     created_at = Column(db.DateTime(True), default=db.func.now())
 
     __tablename__ = 'events'

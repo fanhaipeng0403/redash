@@ -175,10 +175,10 @@ def TestUser():
 #
 if __name__ == '__main__':
     # 删除全部数据库
-    Base.metadata.drop_all(engine)
+    # Base.metadata.drop_all(engine)
 
     # 初始化数据库
-    Base.metadata.create_all(engine)
+    # Base.metadata.create_all(engine)
     # 删除全部数据库
     # Base.metadata.drop_all(engine)
     # 删除指定的数据库
@@ -187,11 +187,11 @@ if __name__ == '__main__':
     # Blog.__table__.drop(engine)
 
     # 新增数据
-    newUser()
+    # newUser()
     # 新增多条数据
-    addmoreUser()
+    # addmoreUser()
     # 新增数据含中文
-    addUserForZhCn()
+    # addUserForZhCn()
     # 查询数据
     queryUser()
 
@@ -201,8 +201,8 @@ if __name__ == '__main__':
     # TestUser()
 
     # 执行sql语句
-    SQlUser()
+    # SQlUser()
 
     # 执行sql语句2
-    SQlUser2()
+    # SQlUser2()
     print('ok')
