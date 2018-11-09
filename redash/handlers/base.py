@@ -5,7 +5,7 @@
 import time
 from inspect import isclass
 
-from flask import Blueprint, current_app, request, jsonify
+from flask import Blueprint, current_app, request
 from flask_login import current_user, login_required
 from flask_restful import Resource, abort
 from redash import settings
@@ -21,6 +21,7 @@ from sqlalchemy_utils import sort_query
 routes = Blueprint('redash', __name__, template_folder=settings.fix_assets_path('templates'))
 
 
+##########################所有api的基类
 class BaseResource(Resource):
     decorators = [login_required]
 
@@ -51,10 +52,12 @@ class BaseResource(Resource):
         for k, v in updates.items():
             setattr(model, k, v)
 
-    # 请求记录器, 用于传统的url请求
-    #  用户自定义埋点？？？
-    # 记录 用户的的user_id，组织，访问的页面，动作，client相关信息
 
+##########################所有api的基类
+
+# 请求记录器, 用于传统的url请求
+#  用户自定义埋点？？？
+# 记录 用户的的user_id，组织，访问的页面，动作，client相关信息
 
 def record_event(org, user, options):
     if user.is_api_user():
@@ -80,10 +83,14 @@ def record_event(org, user, options):
     record_event_task.delay(options)
 
 
+###########################
+
+
 def require_fields(req, fields):
     for f in fields:
         if f not in req:
             abort(400)
+
 
 #####获得或者404 小工具
 def get_object_or_404(fn, *args, **kwargs):
@@ -94,6 +101,9 @@ def get_object_or_404(fn, *args, **kwargs):
     except NoResultFound:
         abort(404)
     return rv
+
+
+######################
 
 
 def paginate(query_set, page, page_size, serializer, **kwargs):
@@ -131,13 +141,12 @@ def org_scoped_rule(rule):
     return rule
 
 
-
 ########################自定义flask的json类型response的转换#############
 # jsonify的源码
 
-    # return current_app.response_class( (dumps(data, indent=indent, separators=separators), '\n'),
-    #     mimetype=current_app.config['JSONIFY_MIMETYPE']
-    # )
+# return current_app.response_class( (dumps(data, indent=indent, separators=separators), '\n'),
+#     mimetype=current_app.config['JSONIFY_MIMETYPE']
+# )
 
 def json_response(response):
     return current_app.response_class(json_dumps(response), mimetype='application/json')

@@ -33,6 +33,8 @@ class ApiExt(Api):
 api = ApiExt()
 
 
+#######################################################################
+# 兼容flask_login
 @api.representation('application/json')
 def json_representation(data, code, headers=None):
     # Flask-Restful checks only for flask.Response but flask-login uses werkzeug.wrappers.Response
@@ -41,12 +43,18 @@ def json_representation(data, code, headers=None):
     resp = make_response(json_dumps(data), code)
     resp.headers.extend(headers or {})
     return resp
+#######################################################################
 
 
+
+# alert
 api.add_org_resource(AlertResource, '/api/alerts/<alert_id>', endpoint='alert')
 api.add_org_resource(AlertSubscriptionListResource, '/api/alerts/<alert_id>/subscriptions', endpoint='alert_subscriptions')
 api.add_org_resource(AlertSubscriptionResource, '/api/alerts/<alert_id>/subscriptions/<subscriber_id>', endpoint='alert_subscription')
 api.add_org_resource(AlertListResource, '/api/alerts', endpoint='alerts')
+
+
+
 
 api.add_org_resource(DashboardListResource, '/api/dashboards', endpoint='dashboards')
 api.add_org_resource(DashboardResource, '/api/dashboards/<dashboard_slug>', endpoint='dashboard')

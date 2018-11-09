@@ -1,3 +1,8 @@
+"""
+数据库查询耗时设置
+以及使用statsD记录在整个项目周期
+
+"""
 import logging
 import time
 

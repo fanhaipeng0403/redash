@@ -1,5 +1,9 @@
-# print 到chrome的console里
-# https://glasslion.github.io/zha-beta/post/57590624308/chrome-logger/
+
+""""
+debug flask的请求，查询耗时“
+
+https://www.helplib.com/GitHub/article_97947
+"""
 
 import time
 
@@ -88,6 +92,7 @@ def chrome_log(response):
     # 结束
     ######################################################################
 
+    ## 固定搭配？？？
     header = console.get_header()
     if header is not None:
         response.headers.add(*header)
