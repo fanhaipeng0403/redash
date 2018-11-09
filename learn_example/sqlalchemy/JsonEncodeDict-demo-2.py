@@ -74,11 +74,12 @@ if __name__ == '__main__':
 
     m1.name = 'xiaolang'
     #######session 提交后，name 关联到了query
+
     # assert m1 in session.dirty
 
     #######session 提交后， data将不再关联到query(解决方法，按着JsonEncodeDict-demo-1.py来）
 
-    m1.data['value1'] = 'bar'
+    m1.data['value1'] = 'bar'#数据库的值，不被改变
     session.commit()
     # assert m1 in session.dirty
 

@@ -76,8 +76,11 @@ if __name__ == '__main__':
     session.commit()
 
     #######session 提交后， data 可以关联到query
-    m1.data['value1'] = 'bar'
+
     m1.name = 'xiaolang'
+
+    m1.data['value1'] = 'bar'#数据库的值，将被改变
+
     # assert m1 in session.dirty
     session.commit()
 
