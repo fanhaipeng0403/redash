@@ -1,5 +1,3 @@
-
-
 # https://blog.csdn.net/u011402596/article/details/38510547
 
 # https://www.xncoding.com/2016/03/07/python/sqlalchemy02.html
@@ -128,6 +126,7 @@ _gfk_types = {}
 
 
 class GFKBase(object):
+    ### 可能redash 早期使用的是Peewee 数据ORM？？？？？？？？？？？？？？？？？？？？？？？？
     """
     Compatibility with 'generic foreign key' approach Peewee used.
     """
@@ -155,11 +154,9 @@ class GFKBase(object):
         self.object_id = value.id
 
 
-# XXX replace JSONEncodedDict and MutableDict with real JSON field
-
-
 ########################################################################
 # 自定义字段类型
+##### 第一步
 class JSONEncodedDict(TypeDecorator):
     impl = db.Text
 
@@ -171,10 +168,11 @@ class JSONEncodedDict(TypeDecorator):
             return value
         return json.loads(value)
 
+
 # https://docs.sqlalchemy.org/en/latest/orm/extensions/mutable.html
 
 
-
+##### 第二步
 class MutableDict(Mutable, dict):
     @classmethod
     def coerce(cls, key, value):
@@ -201,8 +199,11 @@ class MutableDict(Mutable, dict):
         dict.__delitem__(self, key)
         self.changed()
 
-#对实例无论怎么修改其json字段都无法正常保存到数据库中,目测应该是sqlalchemy没有检测到这个字段的变化而导致的。
-# 做如下的操作
+
+##### 第三步
+# MutableDict.associate_with(JSONEncodedDict)
+# 或
+# settings = Column(MutableDict.as_mutable(JSONEncodedDict))
 
 
 class MutableList(Mutable, list):
@@ -217,7 +218,6 @@ class MutableList(Mutable, list):
         ##################################################################手动触发监测
 
     @classmethod
-
     # 强制将某个类型，转为定制类型
     def coerce(cls, key, value):
         if not isinstance(value, MutableList):
@@ -239,7 +239,6 @@ class TimestampMixin:
 
 
 ###############################################################################################################
-
 
 
 class ChangeTrackingMixin(object):
@@ -348,7 +347,7 @@ class Organization(TimestampMixin, db.Model):
     name = Column(db.String(255))
     slug = Column(db.String(255), unique=True)
 
-    MutableDict.associate_with(JSONEncodedDict)
+    # MutableDict.associate_with(JSONEncodedDict)
 
     settings = Column(MutableDict.as_mutable(JSONEncodedDict))
     groups = db.relationship("Group", lazy="dynamic")
@@ -369,8 +368,7 @@ class Organization(TimestampMixin, db.Model):
 
     # https://www.xncoding.com/2016/03/07/python/sqlalchemy02.html
 
-
-                                                            #### 关联查询时候的排序
+    #### 关联查询时候的排序
     events = db.relationship("Event", lazy="dynamic", order_by="desc(Event.created_at)", )
 
     __tablename__ = 'organizations'
@@ -819,7 +817,8 @@ class QueryResult(db.Model, BelongsToOrgMixin):
 
     ########################################################################################################
     # organizations 默认为Class的小写名
-    org_id = Column(db.Integer, db.ForeignKey('organizations.id'))  # ORM层的外键, 键， 顾名思义， 是像id ，user_id ,user_name . 这样确定行标识的东西
+    org_id = Column(db.Integer,
+                    db.ForeignKey('organizations.id'))  # ORM层的外键, 键， 顾名思义， 是像id ，user_id ,user_name . 这样确定行标识的东西
     org = db.relationship(Organization)  # 行的名称，或者说资源的名称
     ### 见上面的列出的字段,你会发现
     # 实际上数据库层次并没这个og字段，这是ORM层，为了直接关联org queryOne的表达方式
@@ -989,9 +988,7 @@ def should_schedule_next(previous_iteration, now, schedule, failures):
 
 
 class Query(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model):
-
-
-## 关联依据，foreignKey， 以及关联法则, relationship
+    ## 关联依据，foreignKey， 以及关联法则, relationship
 
     # 外键存在于真实的数据库，是sqlalchemy表对象和其他表对象，关联起来的依据
     # 一般位于从表中
@@ -999,18 +996,17 @@ class Query(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model):
     # relationship， 规定了表对象之间处理的约束, relationship好多参数~~~~~~~~~~~~~
     ## 关系是相互的，放在哪个表里？？？？？？？
 
-
     # 外键约束？？？？？？？？？？？？？？？？？？？？？？？？？
 
-# MYSQL 层面的外键约束
-# 1. RESTRICT：父表数据被删除，会阻止删除。默认就是这一项。
-# 2. NO ACTION：在MySQL中，同RESTRICT。
-# 3. CASCADE：级联删除。
+    # MYSQL 层面的外键约束
+    # 1. RESTRICT：父表数据被删除，会阻止删除。默认就是这一项。
+    # 2. NO ACTION：在MySQL中，同RESTRICT。
+    # 3. CASCADE：级联删除。
 
-# 4. SET NULL：父表数据被删除，子表数据会设置为NULL。
-# ORM层
-## CASCADE
-## ORM层面删除数据，会无视mysql级别的外键约束。直接会将对应的数据删除，然后将从表中的那个外键设置为NULL。如果想要避免这种行为，应该将从表中的外键的`nullable=False`。
+    # 4. SET NULL：父表数据被删除，子表数据会设置为NULL。
+    # ORM层
+    ## CASCADE
+    ## ORM层面删除数据，会无视mysql级别的外键约束。直接会将对应的数据删除，然后将从表中的那个外键设置为NULL。如果想要避免这种行为，应该将从表中的外键的`nullable=False`。
     id = Column(db.Integer, primary_key=True)
 
     version = Column(db.Integer, default=1)
@@ -1032,16 +1028,13 @@ class Query(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model):
 
     query_hash = Column(db.String(32))
 
-    api_key = Column(db.String(40), default=lambda: generate_token(40)) # default可以是个called的东西
+    api_key = Column(db.String(40), default=lambda: generate_token(40))  # default可以是个called的东西
 
     user_id = Column(db.Integer, db.ForeignKey("users.id"))
-    user = db.relationship(User, foreign_keys=[user_id]) ###############################???????????????????????????
-
+    user = db.relationship(User, foreign_keys=[user_id])  ###############################???????????????????????????
 
     last_modified_by_id = Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     last_modified_by = db.relationship(User, backref="modified_queries", foreign_keys=[last_modified_by_id])
-
-
 
     is_archived = Column(db.Boolean, default=False, index=True)
 
@@ -1069,8 +1062,7 @@ class Query(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model):
     # 默认排序
     # __mapper_args__ = { "order_by":time.desc() }
 
-
-    __mapper_args__ = { "version_id_col": version, 'version_id_generator': False }
+    __mapper_args__ = {"version_id_col": version, 'version_id_generator': False}
 
     def archive(self, user=None):
         db.session.add(self)
@@ -1520,7 +1512,6 @@ class Dashboard(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model
     is_archived = Column(db.Boolean, default=False, index=True)
     is_draft = Column(db.Boolean, default=True, index=True)
 
-
     tips = """
     八、懒加载(是查询对象，还是默认, 查询对象.all()) 
 
@@ -1536,8 +1527,6 @@ class Dashboard(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model
 
 
     """
-
-
 
     widgets = db.relationship('Widget', backref='dashboard', lazy='dynamic')
     tags = Column('tags', MutableList.as_mutable(postgresql.ARRAY(db.Unicode)), nullable=True)
