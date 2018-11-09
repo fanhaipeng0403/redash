@@ -46,8 +46,9 @@ DELETE /collection/resource：返回一个空文档
 #######################################################################
 
 通常有这样的两个后端视图
-/api/alerts
-/api/alerts/<alert_id>
+/api/alerts             xxxxxxListResouce
+
+/api/alerts/<alert_id>   xxxxxxResouce
 
 /api/alerts/<alert_id>/subscriptions
 /api/alerts/<alert_id>/subscriptions/<subscriber_id>
@@ -104,11 +105,15 @@ class AlertResource(BaseResource):
 # api.add_org_resource(AlertListResource,'/api/alerts', endpoint='alerts')
 class AlertListResource(BaseResource):
     def post(self):
+
+        #忽视mimetype类型，强制为Json类型
+
         req = request.get_json(True)
+
+        # 判断请求参数
         require_fields(req, ('options', 'name', 'query_id'))
 
-        query = models.Query.get_by_id_and_org(req['query_id'],
-                                               self.current_org)
+        query = models.Query.get_by_id_and_org(req['query_id'], self.current_org)
         require_access(query.groups, self.current_user, view_only)
 
         alert = models.Alert(

@@ -85,7 +85,7 @@ def record_event(org, user, options):
 
 ###########################
 
-
+###参数缺失，400， 返回bad request
 def require_fields(req, fields):
     for f in fields:
         if f not in req:
