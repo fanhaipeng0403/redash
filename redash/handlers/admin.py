@@ -37,8 +37,7 @@ def outdated_queries():
         outdated_queries = []
 
     return json_response(
-        dict(queries=[q.to_dict(with_stats=True, with_last_modified_by=False)
-                      for q in outdated_queries],
+        dict(queries=[q.to_dict(with_stats=True, with_last_modified_by=False) for q in outdated_queries],
              updated_at=manager_status['last_refresh_at']))
 
 
