@@ -1,3 +1,6 @@
+### admin 查看redis里task 运行状态
+
+
 import json
 
 from flask import request
@@ -16,15 +19,14 @@ from redash.tasks.queries import QueryTaskTracker
 @login_required
 def outdated_queries():
     ### redis-----hash get all
-    manager_status = redis_connection.hgetall('redash:status') # "Return a Python dict of the hash's name/value pairs"
-    query_ids = json.loads(manager_status.get('query_ids', '[]')) # redis Hash结构里 嵌套了一个list，被json序列化为了字符串
+    manager_status = redis_connection.hgetall('redash:status')  # "Return a Python dict of the hash's name/value pairs"
+    query_ids = json.loads(manager_status.get('query_ids', '[]'))  # redis Hash结构里 嵌套了一个list，被json序列化为了字符串
 
     if query_ids:
 
-
         ###用的了 in_ 和 order_by 和 desc ， outerJoin
 
-        #https://www.xncoding.com/2016/03/07/python/sqlalchemy02.html
+        # https://www.xncoding.com/2016/03/07/python/sqlalchemy02.html
 
         # 定义好了外键,系统就知道如何去关联
         outdated_queries = (models.db.session.query(models.Query)
@@ -44,10 +46,14 @@ def outdated_queries():
 @require_super_admin
 @login_required
 def queries_tasks():
+    # limit参数设计借鉴
     global_limit = request.args.get('limit', 50, type=int)
+
     waiting_limit = int(request.args.get('waiting_limit', global_limit))
     progress_limit = int(request.args.get('progress_limit', global_limit))
     done_limit = int(request.args.get('done_limit', global_limit))
+
+    # QueryTaskTracker.WAITING_LIST, redis的key值
 
     waiting = QueryTaskTracker.all(QueryTaskTracker.WAITING_LIST, limit=waiting_limit)
     in_progress = QueryTaskTracker.all(QueryTaskTracker.IN_PROGRESS_LIST, limit=progress_limit)

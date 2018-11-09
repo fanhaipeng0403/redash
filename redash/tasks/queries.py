@@ -103,13 +103,33 @@ class QueryTaskTracker(object):
 
     @classmethod
     def all(cls, list_name, offset=0, limit=-1):
+         # -1 表示最后一个，
+         # ZRANGE salary 0 - 1 WITHSCORES  # 显示整个有序集成员
+
+
+############################################
+
         if limit != -1:
             limit -= 1
 
         if offset != 0:
             offset -= 1
 
+# api 输入 offset =1 ,limit=5
+# 实际  offset =0 ,limit=4
+# 为了符合大众的概念？？？
+
+############################################
+
+        # Redis 有序集合结构(单元唯一，带有的分数可以相同）
+        # http://www.runoob.com/redis/redis-sorted-sets.html
+
+        #z range,  正序
+        # z rev range ,反序列
         ids = redis_connection.zrevrange(list_name, offset, limit)
+
+
+        #批量执行，想象把很对ids放入一个管道，然后一起发送过去
         pipe = redis_connection.pipeline()
         for id in ids:
             pipe.get(id)
