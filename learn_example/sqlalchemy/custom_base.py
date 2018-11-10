@@ -37,4 +37,9 @@ if __name__ == '__main__':
     db.session.commit()
 
     data = db.session.query(MyDataClass3).first()
-    print(data.to_dict())
+
+    print(
+        MyDataClass3.query.first().to_dict()
+
+    )
+

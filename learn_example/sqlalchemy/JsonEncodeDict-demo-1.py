@@ -87,7 +87,8 @@ if __name__ == '__main__':
 
     my_data= session.query(MyDataClass1).filter_by(id=1).one()
 
-    print (row_to_dict(my_data))
+    MyDataClass1.query.first() # 这种是flask_sqlalchemy的专属写法
+
 
 
     # a= my_data.data
