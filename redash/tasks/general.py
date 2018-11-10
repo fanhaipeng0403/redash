@@ -35,6 +35,8 @@ def version_check():
 
 @celery.task(name="redash.tasks.subscribe")
 def subscribe(form):
+
+    ###延时通知给服务商，创建成功
     logger.info("Subscribing to: [security notifications=%s], [newsletter=%s]", form['security_notifications'], form['newsletter'])
     data = {
         'admin_name': form['name'],
