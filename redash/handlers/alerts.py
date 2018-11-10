@@ -59,36 +59,44 @@ import time
 
 from flask import request
 from funcy import project
-from redash import models
 from redash.handlers.base import (BaseResource, get_object_or_404,
                                   require_fields)
+#################################################################################################################################
+from redash.models import db, Alert, Query, NotificationDestination, AlertSubscription
+
+# Alert 设计分析
+
+# 1. Alert  alert的配置
+# 2. Query, alert用了那个查询
+# 3. NotificationDestination, 订阅者的信息模板
+# 4. AlertSubscription， user订阅了那个alert用了那个模板
+#
+#################################################################################################################################
 from redash.permissions import (require_access, require_admin_or_owner,
                                 require_permission, view_only)
 from redash.serializers import serialize_alert
 
-session = models.db.session
+session = db.session
+
 
 # 注册到 api.add_org_resource(AlertResource, '/api/alerts/<alert_id>', endpoint='alert')
 # 导出api到handler的__init__.py
 # api.init_app(app)
 
 
-
 # 更新某个alert
 
 class AlertResource(BaseResource):
     def get(self, alert_id):
-        
-        alert = get_object_or_404(models.Alert.get_by_id_and_org, alert_id, self.current_org)
-        
+        alert = get_object_or_404(Alert.get_by_id_and_org, alert_id, self.current_org)
+
         require_access(alert.groups, self.current_user, view_only)
-        
-         # serialize_alert 对返回的查询列，进行特定处理，转换为前端需要的json
-        
+
+        # serialize_alert 对返回的查询列，进行特定处理，转换为前端需要的json
+
         return serialize_alert(alert)
 
     def post(self, alert_id):
-
         ## 获得参数
         req = request.get_json(True)
 
@@ -96,23 +104,20 @@ class AlertResource(BaseResource):
         params = project(req, ('options', 'name', 'query_id', 'rearm'))
 
         ## 根据参数查询
-        alert = get_object_or_404(models.Alert.get_by_id_and_org, alert_id, self.current_org)
+        alert = get_object_or_404(Alert.get_by_id_and_org, alert_id, self.current_org)
 
         ##判断权限
         require_admin_or_owner(alert.user.id)
-
 
         ######
         # for k, v in updates.items():
         #     setattr(model, k, v)
 
-
-        #进行更新
+        # 进行更新
         self.update_model(alert, params)
         #######
 
-
-        #提交更新
+        # 提交更新
         session.commit()
 
         self.record_event({
@@ -127,11 +132,10 @@ class AlertResource(BaseResource):
         return serialize_alert(alert)
 
     def delete(self, alert_id):
-        alert = get_object_or_404(models.Alert.get_by_id_and_org, alert_id, self.current_org)
+        alert = get_object_or_404(Alert.get_by_id_and_org, alert_id, self.current_org)
         require_admin_or_owner(alert.user_id)
         session.delete(alert)
         session.commit()
-
 
 
 # 创建alert,获取所有alerts
@@ -140,8 +144,7 @@ class AlertResource(BaseResource):
 # api.add_org_resource(AlertListResource,'/api/alerts', endpoint='alerts')
 class AlertListResource(BaseResource):
     def post(self):
-
-        #忽视mimetype类型，强制为Json类型
+        # 忽视mimetype类型，强制为Json类型
 
         req = request.get_json(True)
 
@@ -149,15 +152,15 @@ class AlertListResource(BaseResource):
         require_fields(req, ('options', 'name', 'query_id'))
 
         #### 根据哪个query_id创建的alert
-        query = models.Query.get_by_id_and_org(req['query_id'], self.current_org)
+        query = Query.get_by_id_and_org(req['query_id'], self.current_org)
 
         ## 权限系统？？？？？？？？？？？？？？
         require_access(query.groups, self.current_user, view_only)
 
         # query_rel 是 relationShip， 传对方的行对象,需要提供
         # 但是不用提供外键对应的列
-        alert = models.Alert( name=req['name'], query_rel=query,
-                              user=self.current_user, rearm=req.get('rearm'), options=req['options'] )
+        alert = Alert(name=req['name'], query_rel=query,
+                      user=self.current_user, rearm=req.get('rearm'), options=req['options'])
 
         session.add(alert)
         session.flush()
@@ -170,36 +173,32 @@ class AlertListResource(BaseResource):
             'object_type': 'alert'
         })
 
-
         ### RESETFUL 规范， 不能只是响应个200，就完事了， 最好把创建好的东西返回给前端
         return serialize_alert(alert)
 
     @require_permission('list_alerts')
     def get(self):
-        return [serialize_alert(alert) for alert in models.Alert.all(group_ids=self.current_user.group_ids)]
-
+        return [serialize_alert(alert) for alert in Alert.all(group_ids=self.current_user.group_ids)]
 
 
 # api.add_org_resource(AlertSubscriptionListResource, '/api/alerts/<alert_id>/subscriptions', endpoint='alert_subscriptions')
 
 
-    # alerts, s 通常有个all的类方法
-    # @classmethod
-    # def all(c
+# alerts, s 通常有个all的类方法
+# @classmethod
+# def all(c
 
 class AlertSubscriptionListResource(BaseResource):
     def post(self, alert_id):
         req = request.get_json(True)
 
-        alert = models.Alert.get_by_id_and_org(alert_id, self.current_org)
+        alert = Alert.get_by_id_and_org(alert_id, self.current_org)
         require_access(alert.groups, self.current_user, view_only)
-
-
 
         kwargs = {'alert': alert, 'user': self.current_user}
 
         if 'destination_id' in req:
-            destination = models.NotificationDestination.get_by_id_and_org(req['destination_id'], self.current_org)
+            destination = NotificationDestination.get_by_id_and_org(req['destination_id'], self.current_org)
             kwargs['destination'] = destination
 
         # 用提供外键对应的列
@@ -212,7 +211,7 @@ class AlertSubscriptionListResource(BaseResource):
         # query
         # notification
 
-        subscription = models.AlertSubscription(**kwargs)
+        subscription = AlertSubscription(**kwargs)
         session.add(subscription)
         session.commit()
 
@@ -229,19 +228,18 @@ class AlertSubscriptionListResource(BaseResource):
 
     def get(self, alert_id):
         alert_id = int(alert_id)
-        alert = models.Alert.get_by_id_and_org(alert_id, self.current_org)
+        alert = Alert.get_by_id_and_org(alert_id, self.current_org)
         require_access(alert.groups, self.current_user, view_only)
 
-        subscriptions = models.AlertSubscription.all(alert_id)
+        subscriptions = AlertSubscription.all(alert_id)
         return [s.to_dict() for s in subscriptions]
-
 
 
 # 退订，那个用户退订了那个alert
 # api.add_org_resource(AlertSubscriptionResource, '/api/alerts/<alert_id>/subscriptions/<subscriber_id>', endpoint='alert_subscription')
 class AlertSubscriptionResource(BaseResource):
     def delete(self, alert_id, subscriber_id):
-        subscription = models.AlertSubscription.query.get_or_404(subscriber_id)
+        subscription = AlertSubscription.query.get_or_404(subscriber_id)
         require_admin_or_owner(subscription.user.id)
         session.delete(subscription)
         session.commit()

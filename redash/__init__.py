@@ -224,7 +224,9 @@ def create_app(load_admin=True):
         init_admin(app)
 
     # 数据库
+    # db = SQLAlchemy(app)
     db.init_app(app)
+
 
     # 数据库迁移
     migrate.init_app(app, db)

@@ -62,6 +62,9 @@ from sqlalchemy_utils import generic_relationship, EmailType
 from sqlalchemy_utils.types import TSVectorType
 
 
+#######################################################################################################################
+
+## 并非定制Model
 class SQLAlchemyExt(SQLAlchemy):
     def apply_pool_defaults(self, app, options):
         if settings.SQLALCHEMY_DISABLE_POOL:
@@ -70,12 +73,12 @@ class SQLAlchemyExt(SQLAlchemy):
         else:
             return super(SQLAlchemyExt, self).apply_pool_defaults(app, options)
 
-
-############ db 是 flask sqlachemy的类的实例
+############ db 是 sqlachemy的类的实例
 db = SQLAlchemyExt(session_options={
     'expire_on_commit': False
 })
 
+#######################################################################################################################
 # Make sure the SQLAlchemy mappers are all properly configured first.
 # This is required by SQLAlchemy-Searchable as it adds DDL listeners
 # on the configuration phase of models.
@@ -1729,11 +1732,15 @@ class ApiKey(TimestampMixin, GFKBase, db.Model):
 class NotificationDestination(BelongsToOrgMixin, db.Model):
     id = Column(db.Integer, primary_key=True)
     org_id = Column(db.Integer, db.ForeignKey("organizations.id"))
-    org = db.relationship(Organization, backref="notification_destinations")
     user_id = Column(db.Integer, db.ForeignKey("users.id"))
+
+
+    org = db.relationship(Organization, backref="notification_destinations")
     user = db.relationship(User, backref="notification_destinations")
+
     name = Column(db.String(255))
     type = Column(db.String(255))
+
     options = Column(ConfigurationContainer.as_mutable(Configuration))
     created_at = Column(db.DateTime(True), default=db.func.now())
 
