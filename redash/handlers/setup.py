@@ -27,8 +27,14 @@ def create_org(org_name, user_name, email, password):
     db.session.add_all([default_org, admin_group, default_group])
     db.session.commit()
 
+
+
+###############################创建用户
     user = User(org=default_org, name=user_name, email=email, group_ids=[admin_group.id, default_group.id])
+
+    ####  不保存密码，直接hash进去
     user.hash_password(password)
+    ####
 
     db.session.add(user)
     db.session.commit()
@@ -55,6 +61,7 @@ def setup():
 
     ####创建成功
     if request.method == 'POST' and form.validate():
+
         default_org, user = create_org(form.org_name.data, form.name.data, form.email.data, form.password.data)
 
         g.org = default_org
@@ -70,6 +77,7 @@ def setup():
         if form.newsletter.data or form.security_notifications:
             subscribe.delay(form.data)
 
+        # D:\redash - master\redash\handlers\static.py
         return redirect(url_for('redash.index', org_slug=None))
 
 

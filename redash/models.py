@@ -605,6 +605,14 @@ class User(TimestampMixin, db.Model, BelongsToOrgMixin, UserMixin, PermissionsCh
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
 
+
+    ###个人觉得使用内置的更好
+    # def hash_password(self, password):
+    #     from werkzeug.security import generate_password_hash
+    #     self.password_hash = generate_password_hash(password,
+    #                                                    method='pbkdf2:sha512',
+    #                                                    salt_length=64)
+
     def verify_password(self, password):
         return self.password_hash and pwd_context.verify(password, self.password_hash)
 
