@@ -38,17 +38,32 @@ def create_org(org_name, user_name, email, password):
 
 @routes.route('/setup', methods=['GET', 'POST'])
 def setup():
+
+   ##############################################################################################
+   ## 首次配置
     if current_org != None or settings.MULTI_ORG:
         return redirect('/')
+
+
+   ##############################################################################################
 
     form = SetupForm(request.form)
     form.newsletter.data = True
     form.security_notifications.data = True
 
+
+
+    ####创建成功
     if request.method == 'POST' and form.validate():
         default_org, user = create_org(form.org_name.data, form.name.data, form.email.data, form.password.data)
 
         g.org = default_org
+
+        # current_user, login_required, login_user, logout_user
+        # login_manager = LoginManager()
+        # login_manager.init_app(app)
+
+
         login_user(user)
 
         # signup to newsletter if needed
@@ -56,5 +71,6 @@ def setup():
             subscribe.delay(form.data)
 
         return redirect(url_for('redash.index', org_slug=None))
+
 
     return render_template('setup.html', form=form)
