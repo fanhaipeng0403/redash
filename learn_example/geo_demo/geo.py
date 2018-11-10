@@ -1,5 +1,7 @@
 # 安装
 # geoip2==2.5.0
+# official MaxMind geoip2 package
+# https://geoip2.readthedocs.io/en/latest/#database-example
 
 
 import os

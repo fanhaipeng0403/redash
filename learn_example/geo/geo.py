@@ -1,4 +1,11 @@
-from geoip import geolite2
+# hgeoip2==2.5.0ttps://github.com/mitsuhiko/python-geoip
+# https://pythonhosted.org/python-geoip/
+# python-geoip-geolite2==2015.303
+
+
+from geoip import geolite2 # 不再支持Python3
+# https://stackoverflow.com/questions/32575666/python-geoip-does-not-work-on-python3-4
+
 
 
 def get_location(ip):
@@ -11,4 +18,4 @@ def get_location(ip):
 
     return match.country
 
-print (get_location(b'111.197.244.232'))
+
