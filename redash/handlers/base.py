@@ -119,7 +119,7 @@ def paginate(query_set, page, page_size, serializer, **kwargs):
 
 
     #我觉得这种可读性更好
-    
+
     # 取最大分页数
     # import math
     # max_page = math.ceil(count / page_size)

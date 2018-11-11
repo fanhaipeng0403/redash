@@ -373,7 +373,27 @@ class Organization(TimestampMixin, db.Model):
     # MutableDict.associate_with(JSONEncodedDict)
 
     settings = Column(MutableDict.as_mutable(JSONEncodedDict))
-    groups = db.relationship("Group", lazy="dynamic")
+
+######################################################################################################
+    # org_id = Column(db.Integer, db.ForeignKey('organizations.id'))
+    # org = db.relationship(Organization, back_populates="groups")
+    #
+
+    # Organization.Groups， 我理解可能需要四步：
+
+    # 1.在Group的Model里，外键到这个Organization , org_id = Column(db.Integer, db.ForeignKey('organizations.id'))
+
+    # 2. org = db.relationship(Organization)
+
+    # 3. org = db.relationship(Organization , back_populates="groups"),添加back_populates
+
+    # 4. 在Organization里放置 groups = db.relationship("Group", lazy="dynamic")
+
+
+    # 明天测试
+
+######################################################################################################
+
 
     # http://docs.jinkan.org/docs/flask-sqlalchemy/models.html
     # lazy 决定了 SQLAlchemy 什么时候从数据库中加载数据:
@@ -393,6 +413,7 @@ class Organization(TimestampMixin, db.Model):
 
     #### 关联查询时候的排序
     events = db.relationship("Event", lazy="dynamic", order_by="desc(Event.created_at)", )
+    groups = db.relationship("Group", lazy="dynamic")
 
     __tablename__ = 'organizations'
 
