@@ -366,6 +366,8 @@ class Organization(TimestampMixin, db.Model):
 
     id = Column(db.Integer, primary_key=True)
     name = Column(db.String(255))
+
+    # slug其实就是表示一个合法的url的一个部分，通常是人可以直接读懂的一个大标题
     slug = Column(db.String(255), unique=True)
 
     # MutableDict.associate_with(JSONEncodedDict)
@@ -406,6 +408,7 @@ class Organization(TimestampMixin, db.Model):
 
     @property
     def default_group(self):
+
         return self.groups.filter(Group.name == 'default', Group.type == Group.BUILTIN_GROUP).first()
 
     @property

@@ -47,13 +47,24 @@ class MyDataClass3(db.Model):
 
 
 if __name__ == '__main__':
-    db.create_all()
-    data = MyDataClass3(data=1, name='xxx')
-    db.session.add(data)
-    db.session.commit()
+    # db.create_all()
+    # data = MyDataClass3(data=1, name='xxx')
+    # db.session.add(data)
+    # db.session.commit()
+    #
+    # data = db.session.query(MyDataClass3).first()
+    #
+    # print(MyDataClass3.query.first().to_dict())
 
-    data = db.session.query(MyDataClass3).first()
+###################### flask sqlalchemy 的分页函数
+    data = db.session.query(MyDataClass3)
 
-    print(MyDataClass3.query.first().to_dict())
+    #总共多少行
+    total =data.paginate(2, 5).total
+    # 5表示5个5个的分，2表示去第二页
+    items =data.paginate(2, 5).item # 返回的[6,7,8,9,10]
 
-    MyDataClass3.create(data=2, name='xxxy')
+
+
+
+

@@ -123,7 +123,12 @@ def paginate(query_set, page, page_size, serializer, **kwargs):
 
     results = query_set.paginate(page, page_size)
 
+    # paginate作用
+    # [1,2,3,4,5,] ==> [[1,2],[3,4],[5]]
+
     # support for old function based serializers
+
+    # from inspect import isclass
     if isclass(serializer):
         items = serializer(results.items, **kwargs).serialize()
     else:

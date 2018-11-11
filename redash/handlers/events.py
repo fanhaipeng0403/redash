@@ -64,4 +64,5 @@ class EventsResource(BaseResource):
     def get(self):
         page = request.args.get('page', 1, type=int)
         page_size = request.args.get('page_size', 25, type=int)
+
         return paginate(self.current_org.events, page, page_size, serialize_event)
