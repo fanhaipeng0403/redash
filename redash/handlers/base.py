@@ -115,16 +115,28 @@ def paginate(query_set, page, page_size, serializer, **kwargs):
     if page < 1:
         abort(400, message='Page must be positive integer.')
 
+        ##############################
+
+
+    #我觉得这种可读性更好
+    
+    # 取最大分页数
+    # import math
+    # max_page = math.ceil(count / page_size)
+    # if page > max_page:
+    #     abort(400, message='Page is out of range.')
+
+    ##############################
     if (page - 1) * page_size + 1 > count > 0:
         abort(400, message='Page is out of range.')
 
+    # 每页最多250，再多前端页面屏幕不够大了？
     if page_size > 250 or page_size < 1:
         abort(400, message='Page size is out of range (1-250).')
 
+    # data = db.session.query(MyDataClass3).paginate(2,5)
+    # 5个5个的分，取第2页内的元素
     results = query_set.paginate(page, page_size)
-
-    # paginate作用
-    # [1,2,3,4,5,] ==> [[1,2],[3,4],[5]]
 
     # support for old function based serializers
 
