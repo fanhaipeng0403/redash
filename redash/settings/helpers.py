@@ -22,6 +22,11 @@ def parse_db_url(url):
 
 
 def fix_assets_path(path):
+    #  先根据此文件的目录，确定项目的根目录，然后再获取其他文件的地址
+    #  D:\redash-master\redash\settings\helpers.py
+    # ../
+    # D:\redash-master\redash\
+    # D:\redash-master\redash\template
     fullpath = os.path.join(os.path.dirname(__file__), "../", path)
     return fullpath
 

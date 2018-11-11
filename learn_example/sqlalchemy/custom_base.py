@@ -2,15 +2,31 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy, Model
 from sqlalchemy import Column, Integer, String, DateTime, func
 
+
 # 定制model基类
 # https://docs.sqlalchemy.org/en/latest/orm/extensions/declarative/mixins.html
 # http://flask-sqlalchemy.pocoo.org/2.3/customizing/
 
-#2.1版本之后才可以
+# 2.1版本之后才可以
 
 class BaseModel(Model):
-    updated_at = Column(DateTime(True), default=func.now(), onupdate=func.now(), nullable=False)
+
+    id = Column(Integer, primary_key=True)
     created_at = Column(DateTime(True), default=func.now(), nullable=False)
+    updated_at = Column(DateTime(True), default=func.now(), onupdate=func.now(), nullable=False)
+
+    @classmethod
+    def create(cls, **kw):
+        session = db.session
+        if 'id' in kw:
+            obj = session.query(cls).get(kw['id'])
+            if obj:
+                return obj
+        obj = cls(**kw)
+        session.add(obj)
+        session.commit()
+        return obj
+
 
     def to_dict(self):
         columns = self.__table__.columns.keys()
@@ -38,8 +54,6 @@ if __name__ == '__main__':
 
     data = db.session.query(MyDataClass3).first()
 
-    print(
-        MyDataClass3.query.first().to_dict()
+    print(MyDataClass3.query.first().to_dict())
 
-    )
-
+    MyDataClass3.create(data=2, name='xxxy')

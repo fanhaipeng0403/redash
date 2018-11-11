@@ -37,7 +37,7 @@ import six
 import xlsxwriter
 from flask import current_app as app, url_for
 from flask_login import AnonymousUserMixin, UserMixin
-from flask_sqlalchemy import SQLAlchemy, BaseQuery
+from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
 from passlib.apps import custom_app_context as pwd_context
 from redash import settings, redis_connection, utils
 from redash.destinations import (get_configuration_schema_for_destination_type,
@@ -63,8 +63,26 @@ from sqlalchemy_utils.types import TSVectorType
 
 
 #######################################################################################################################
+class BaseModel(Model):
 
-## 并非定制Model
+
+    @classmethod
+    def create(cls, **kw):
+        session = db.session
+        if 'id' in kw:
+            obj = session.query(cls).get(kw['id'])
+            if obj:
+                return obj
+        obj = cls(**kw)
+        session.add(obj)
+        session.commit()
+        return obj
+
+
+    def to_dict(self):
+        columns = self.__table__.columns.keys()
+        return {key: getattr(self, key) for key in columns}
+
 class SQLAlchemyExt(SQLAlchemy):
     def apply_pool_defaults(self, app, options):
         if settings.SQLALCHEMY_DISABLE_POOL:
@@ -74,7 +92,7 @@ class SQLAlchemyExt(SQLAlchemy):
             return super(SQLAlchemyExt, self).apply_pool_defaults(app, options)
 
 ############ db 是 sqlachemy的类的实例
-db = SQLAlchemyExt(session_options={
+db = SQLAlchemyExt(model_class=BaseModel, session_options={
     'expire_on_commit': False
 })
 
