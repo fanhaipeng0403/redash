@@ -72,16 +72,17 @@ class Child(db.Model):
 if __name__ == '__main__':
     db.create_all()
     Parent.create(name='ZhangTian')
-    Parent.create(name='ZhangYu')
     Parent.create(name='LiTian')
     Child.create(name='ZhangDi', parent_id=1)
     Child.create(name='LiDi', parent_id=2)
-    parent = db.session.query(Child).first().parent
 
+    ###################################################################
+    parent = db.session.query(Child).first().parent
     print(parent.name)
     for child in parent.child:
         print(child.name)
 
+    ###################################################################
     children = db.session.query(Parent).first().child
 
     for child in children:
