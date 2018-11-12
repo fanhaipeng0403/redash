@@ -2,16 +2,6 @@
 """
 https://docs.sqlalchemy.org/en/latest/orm/relationships.html
 
-    # last_modified_by = db.relationship(User, backref="modified_queries", foreign_keys=[last_modified_by_id])
-    # visualizations = db.relationship("Visualization", cascade="all, delete-orphan")
-    # user = db.relationship(User, backref='favorites')
-    # grantor = db.relationship(User, backref='grantor', foreign_keys=[grantor_id])
-    # grantor = db.relationship(User, backref='grantor', foreign_keys=[grantor_id])
-    # user = db.relationship(User, backref='changes')
-    # user = db.relationship(User, backref='changes')
-    # org = db.relationship(Organization, back_populates="events")
-
-
 主要学习RelationShip
 
 """
@@ -46,4 +36,11 @@ class Keyword(Base):
 # 外键定义于中间表
 # keywords = relationship('Keyword', secondary=post_keywords, backref='posts')
 # 通过sencodary指明中间表
+
+
+
+
+    last_modified_by = db.relationship(User, backref="modified_queries", foreign_keys=[last_modified_by_id])
+    visualizations = db.relationship("Visualization", cascade="all, delete-orphan")
+    grantor = db.relationship(User, backref='grantor', foreign_keys=[grantor_id])
 
