@@ -26,18 +26,4 @@ relationship放置于于两侧，使用back_populates
 
 
 
-    parent_id = Column(Integer, ForeignKey('parent.id'))
-    parent = relationship("Parent", backref='child')  # Parent大写类名或者类名的字符串. child小写表名
-
-    parent = db.session.query(Child).first().parent
-
-    print(parent.name)
-    for child in parent.child:
-        print(child.name)
-
-    children = db.session.query(Parent).first().child
-
-    for child in children:
-        print(child.name)
-
 

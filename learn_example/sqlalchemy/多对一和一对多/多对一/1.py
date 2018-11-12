@@ -59,32 +59,30 @@ class Parent(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(20))
     child_id = Column(Integer, ForeignKey('child.id'))
-
-    children = relationship("Child", back_populates="parent")
+    child = relationship("Child", backref="parent")
 
 
 class Child(db.Model):
     __tablename__ = 'child'
     id = Column(Integer, primary_key=True)
     name = Column(String(20))
-    parent = relationship("Parent", back_populates='children')  # 小写表名反向
 
 
 if __name__ == '__main__':
     db.create_all()
 
-    Child.create(name='ZhangTian')
-    Child.create(name='ZhangYu')
-    Child.create(name='LiTian')
     Parent.create(name='ZhangDi', child_id=1)
     Parent.create(name='LiDi', child_id=2)
 
-    children = db.session.query(Parent).first().children
-    print (children.name)
-    # for child in children:
-    #     print(child.name)
+    Child.create(name='ZhangTian')
+    Child.create(name='LiTian')
 
-    # parent = db.session.query(Child).first().parent
-    # print(parent.name)
-    # for child in parent.children:
+    # child = db.session.query(Parent).first().child
+
+    # for child in child.parent:
     #     print(child.name)
+    #
+
+    parent = db.session.query(Child).first().parent
+
+    b =2

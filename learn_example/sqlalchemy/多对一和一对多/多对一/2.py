@@ -59,13 +59,13 @@ class Parent(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(20))
     child_id = Column(Integer, ForeignKey('child.id'))
-    children = relationship("Child", backref="parent")
 
 
 class Child(db.Model):
     __tablename__ = 'child'
     id = Column(Integer, primary_key=True)
     name = Column(String(20))
+    parent = relationship("Parent", backref="child")
 
 
 if __name__ == '__main__':
@@ -77,8 +77,6 @@ if __name__ == '__main__':
     Child.create(name='ZhangTian')
     Child.create(name='LiTian')
 
-    children = db.session.query(Parent).first().children
-    print(children.name)
+    child = db.session.query(Parent).first().child
+    b =1
 
-    for parent in children.parent:
-        print(parent.name)
