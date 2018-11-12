@@ -5,19 +5,4 @@
 # 物理设计
 child_id 放置于parent表里
 
-# 1.py 
-
-` children = relationship("Child", backref ="parent") `
-relationship放置于Parent类里, Child大写类名或其字符串, 且back_ref反向引用parent(小写表名)
-
-# 2.py 
-
-` parent = relationship("Parent", backref='child') `
-relationship放置于Child类里, Parent大写 且back_ref反向引用child(小写表名)
-
-# 3.py 
-
-` children = relationship("Child", back_populates="parent") `
-` parent = relationship("Parent", back_populates='children') `
-relationship放置于于两侧，使用back_populates
 

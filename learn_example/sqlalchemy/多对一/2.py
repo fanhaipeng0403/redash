@@ -58,24 +58,27 @@ class Parent(db.Model):
     __tablename__ = 'parent'
     id = Column(Integer, primary_key=True)
     name = Column(String(20))
+    child_id = Column(Integer, ForeignKey('child.id'))
 
 
 class Child(db.Model):
     __tablename__ = 'child'
     id = Column(Integer, primary_key=True)
-    parent_id = Column(Integer, ForeignKey('parent.id'))
     name = Column(String(20))
-    parent = relationship("Parent", backref='child')  # Parent大写类名或者类名的字符串. child小写表名
+    parent = relationship("Parent", backref="child")
 
 
 if __name__ == '__main__':
     db.create_all()
-    Parent.create(name='ZhangTian')
-    Parent.create(name='ZhangYu')
-    Parent.create(name='LiTian')
-    Child.create(name='ZhangDi', parent_id=1)
-    Child.create(name='LiDi', parent_id=2)
-    parent = db.session.query(Child).first().parent
-    print(parent.name)
-    for child in parent.child:
-        print(child.name)
+
+    Parent.create(name='ZhangDi', child_id=1)
+    Parent.create(name='LiDi', child_id=2)
+
+    Child.create(name='ZhangTian')
+    Child.create(name='LiTian')
+
+    child = db.session.query(Parent).first().child
+    print(child.name)
+
+    for parent in child.parent:
+        print(parent.name)

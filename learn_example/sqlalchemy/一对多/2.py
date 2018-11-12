@@ -63,8 +63,9 @@ class Parent(db.Model):
 class Child(db.Model):
     __tablename__ = 'child'
     id = Column(Integer, primary_key=True)
-    parent_id = Column(Integer, ForeignKey('parent.id'))
     name = Column(String(20))
+
+    parent_id = Column(Integer, ForeignKey('parent.id'))
     parent = relationship("Parent", backref='child')  # Parent大写类名或者类名的字符串. child小写表名
 
 
@@ -76,6 +77,12 @@ if __name__ == '__main__':
     Child.create(name='ZhangDi', parent_id=1)
     Child.create(name='LiDi', parent_id=2)
     parent = db.session.query(Child).first().parent
+
     print(parent.name)
     for child in parent.child:
+        print(child.name)
+
+    children = db.session.query(Parent).first().child
+
+    for child in children:
         print(child.name)
