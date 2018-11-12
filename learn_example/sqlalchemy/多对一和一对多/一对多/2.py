@@ -93,5 +93,6 @@ if __name__ == '__main__':
     #     print(child.name)
 
     # 当使用 uselist=False, 将从多对一或者一对多，变为1对于1
+
     # 其实就是 children = db.session.query(Parent).first().child, 不在取出的是list,而是list[0]
     # parent = relationship("Parent", backref=backref("child", uselist=False))
