@@ -1087,7 +1087,10 @@ class Query(ChangeTrackingMixin, TimestampMixin, BelongsToOrgMixin, db.Model):
     user = db.relationship(User, foreign_keys=[user_id])  ###############################???????????????????????????
 
     last_modified_by_id = Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+
     last_modified_by = db.relationship(User, backref="modified_queries", foreign_keys=[last_modified_by_id])
+
+
 
     is_archived = Column(db.Boolean, default=False, index=True)
 
