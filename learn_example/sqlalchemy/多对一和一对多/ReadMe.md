@@ -1,6 +1,9 @@
 
 
-# 推荐这种设计,记录少的parent_id（即一对多和多对一中的一），并且放置到child里
+# 设计方法有多种
+
+# 推荐这种设计    D:\redash-master\learn_example\sqlalchemy\多对一和一对多\一对多\2.py
+记录少的parent_id（即一对多和多对一中的一），并且放置到多的表里，（child)
 
 class Parent(db.Model):
     __tablename__ = 'parent'
