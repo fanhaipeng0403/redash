@@ -72,6 +72,7 @@ if __name__ == '__main__':
     db.create_all()
 
     Parent.create(name='ZhangDi', child_id=1)
+    Parent.create(name='ZhangDi', child_id=2)
     Parent.create(name='LiDi', child_id=2)
 
     Child.create(name='ZhangTian')
@@ -83,6 +84,6 @@ if __name__ == '__main__':
     #     print(child.name)
     #
 
-    parent = db.session.query(Child).first().parent
+    parent = db.session.query(Parent).first().child
 
     b =2

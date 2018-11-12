@@ -76,14 +76,22 @@ if __name__ == '__main__':
     Child.create(name='ZhangDi', parent_id=1)
     Child.create(name='LiDi', parent_id=2)
 
-    ###################################################################
-    parent = db.session.query(Child).first().parent
-    print(parent.name)
-    for child in parent.child:
-        print(child.name)
+    parent = db.session.query(Parent).first()
+    db.session.delete(parent)
+    db.session.commit()
 
     ###################################################################
-    children = db.session.query(Parent).first().child
+    # parent = db.session.query(Child).first().parent
+    # print(parent.name)
+    # for child in parent.child:
+    #     print(child.name)
 
-    for child in children:
-        print(child.name)
+    ###################################################################
+    # children = db.session.query(Parent).first().child
+    #
+    # for child in children:
+    #     print(child.name)
+
+    # 当使用 uselist=False, 将从多对一或者一对多，变为1对于1
+    # 其实就是 children = db.session.query(Parent).first().child, 不在取出的是list,而是list[0]
+    # parent = relationship("Parent", backref=backref("child", uselist=False))
