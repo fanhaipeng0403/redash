@@ -1,5 +1,6 @@
 import os
 
+import fire
 from flask import Flask, render_template, url_for, redirect, request, flash
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required, UserMixin
 from flask_sqlalchemy import SQLAlchemy, Model
@@ -137,6 +138,8 @@ def index():
 @login_manager.unauthorized_handler
 def redirect_to_login():
     return redirect(url_for('login'))
+
+
 
 
 if __name__ == '__main__':
