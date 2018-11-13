@@ -130,7 +130,7 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return '我是主页,{}'.format(current_user.name)
+    return render_template('index.html')
 
 
 # 没登录的重定向到登录页面

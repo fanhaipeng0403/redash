@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<div style="width: 500px;margin: auto">
+
+   你好， {{ current_user.name }}
+
+  我是主页
+
+
+
+</div>
+
+<br>
+<a style="float: right" href="{{ url_for('logout') }}">退出</a>
+</body>
+</html>
