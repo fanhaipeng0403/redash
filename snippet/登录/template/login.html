@@ -1,0 +1,34 @@
+{% extends "signed_out.html" %}
+
+{% block title %}Login to Admin{% endblock %}
+
+{% block content %}
+<div class="fixed-width-page">
+  <div class="bg-white tiled">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-danger" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+
+
+    <form role="form" method="post" name="login">
+      <input type="hidden" name="remember" value="on">
+      <div class="form-group">
+        <label for="inputEmail">{{ 'Email' }}</label>
+        <input type="text" class="form-control" id="inputEmail" name="email" value="{{email}}">
+      </div>
+      <div class="form-group">
+        <label for="inputPassword">Password</label>
+        <input type="password" class="form-control" id="inputPassword" name="password">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block m-t-25">Log In</button>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
