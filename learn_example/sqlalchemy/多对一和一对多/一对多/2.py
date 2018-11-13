@@ -66,7 +66,15 @@ class Child(db.Model):
     name = Column(String(20))
 
     parent_id = Column(Integer, ForeignKey('parent.id'))
-    parent = relationship("Parent", backref='child')  # Parent大写类名或者类名的字符串. child小写表名
+    parent = relationship("Parent", backref='child')
+
+
+    # 指定外键
+    # parent = relationship("Parent", backref='child', foreign_keys="[Child.parent_id]")
+    # parent = relationship("Parent", backref='child', foreign_keys="Child.parent_id")
+    # parent = relationship("Parent", backref='child', foreign_keys=[parent_id])
+
+    # back_populates 不可单独使用
 
 
 if __name__ == '__main__':
@@ -76,9 +84,9 @@ if __name__ == '__main__':
     Child.create(name='ZhangDi', parent_id=1)
     Child.create(name='LiDi', parent_id=2)
 
-    parent = db.session.query(Parent).first()
-    db.session.delete(parent)
-    db.session.commit()
+    # parent = db.session.query(Parent).first()
+    # db.session.delete(parent)
+    # db.session.commit()
 
     ###################################################################
     # parent = db.session.query(Child).first().parent
@@ -87,10 +95,11 @@ if __name__ == '__main__':
     #     print(child.name)
 
     ###################################################################
-    # children = db.session.query(Parent).first().child
-    #
-    # for child in children:
-    #     print(child.name)
+    parent = db.session.query(Parent).first()
+    print(parent.name)
+
+    for child in parent.child:
+        print(child.name)
 
     # 当使用 uselist=False, 将从多对一或者一对多，变为1对于1
 
