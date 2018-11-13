@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask, render_template, url_for, redirect, request, flash
-from flask_login import LoginManager, current_user, login_user, logout_user, login_required
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required, UserMixin
 from flask_sqlalchemy import SQLAlchemy, Model
 from sqlalchemy import Column, Integer, DateTime, func
 from sqlalchemy.orm.exc import NoResultFound
@@ -38,22 +38,22 @@ db = SQLAlchemy(app, model_class=BaseModel)
 
 
 ####User Model
-class User(db.Model):
+class User(db.Model, UserMixin):  # UserMixin 里面其实没写什么，主要作用是给user实例 增加几个 is_active is_authenticate is_anonymous 属性
     __tablename__ = 'users'
 
     id = Column(db.Integer, primary_key=True)
     name = Column(db.String(320))
-    email = Column(EmailType)
+    email = Column(EmailType, unique=True)
     password_hash = Column(db.String(128), nullable=True)
     disabled_at = Column(db.DateTime(True), default=None, nullable=True)
 
     def verify_password(self, password):
-        return self.password_hash and check_password_hash(self.password, password)
+        return self.password_hash and check_password_hash(self.password_hash, password)
 
     def hash_password(self, password):
-        self.encrypt_password = generate_password_hash(password,
-                                                       method='pbkdf2:sha512',
-                                                       salt_length=64)
+        self.password_hash = generate_password_hash(password,
+                                                    method='pbkdf2:sha512',
+                                                    salt_length=64)
 
     @property
     def is_disabled(self):
@@ -70,7 +70,6 @@ class User(db.Model):
 
 # 第一步
 ##### 基于cookie的session实现，并且使用secret_key加密
-####  Flask-Login uses sessions for authentication.
 app.secret_key = os.urandom(16)
 
 # 第二步
@@ -105,7 +104,9 @@ def login():
 
     if request.method == 'POST':
         try:
+
             user = User.query.filter_by(email=request.form['email']).one()
+            print(request.form['password'])
             if user and not user.is_disabled and user.verify_password(request.form['password']):
                 remember = ('remember' in request.form)
                 login_user(user, remember=remember)
@@ -129,7 +130,7 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return '我是主页'
+    return '我是主页,{}'.format(current_user.name)
 
 
 # 没登录的重定向到登录页面
@@ -139,85 +140,9 @@ def redirect_to_login():
 
 
 if __name__ == '__main__':
-    db.create_all()
+    # db.create_all()
+    # user = User(name='fanhaipeng', email='938376959@qq.com')
+    # user.hash_password( '12345678')
+    # db.session.add(user)
+    # db.session.commit()
     app.run(debug=True)
-
-# 其他
-
-########################################################################################
-
-# 首次登陆的时候的 闪现信息
-
-# login_manager.login_message = "来了，老弟”
-
-########################################################################################
-
-# ResultFul 使用login_required
-
-# from flask_restful import Resource, abort
-# from flask_login import current_user, login_required
-
-# class BaseResource(Resource):
-#     decorators = [login_required]
-#
-# https://flask-login.readthedocs.io/en/latest/ 对匿名定制权限
-# login_manager.anonymous_user = AnonymousUser
-
-########################################################################################
-
-
-# 指定未注册用户的处理办法
-
-# login.login_view = "account.sign_in"
-
-# 或者使用 @login_manager.unauthorized_handler
-# @login_manager.unauthorized_handler
-# def redirect_to_login():
-#     if request.is_xhr or '/api/' in request.path:
-#         response = jsonify({'message': "Couldn't find resource. Please login and try again."})
-#         response.status_code = 404
-#         return response
-#
-#     login_url = get_login_url(next=request.url, external=False)
-#
-#     return redirect(login_url)
-
-########################################################################################
-
-
-# 如果你不想使用cookie ，而是用request的header值或者api key，请使用 @login_manager.request_loader, 通常用于Http Basic Auth等，第三方认证
-
-# D:\redash-master\redash\authentication\__init__.py
-
-# def load_user_from_request(request):
-#         pass
-# login_manager.request_loader(hmac_load_user_from_request)
-
-
-##############################################################
-# 最佳实践，添加/api/session
-
-# @routes.route(org_scoped_rule('/api/session'), methods=['GET'])
-# @login_required
-# def session(org_slug=None):
-#     if current_user.is_api_user():
-#         user = {
-#             'permissions': [],
-#             'apiKey': current_user.id
-#         }
-#     else:
-#         user = {
-#             'profile_image_url': current_user.profile_image_url,
-#             'id': current_user.id,
-#             'name': current_user.name,
-#             'email': current_user.email,
-#             'groups': current_user.group_ids,
-#             'permissions': current_user.permissions
-#         }
-#
-#     return json_response({
-#         'user': user,
-#         'org_slug': current_org.slug,
-#         'client_config': client_config()
-#     })
-#
