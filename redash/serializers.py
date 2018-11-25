@@ -1,7 +1,5 @@
 """
-This will eventually replace all the `to_dict` methods of the different model
-classes we have. This will ensure cleaner code and better
-separation of concerns.
+所谓序列化就是，将model的orm的query数据转化为可以传递的格式，比如json xml yaml等等
 """
 
 import json

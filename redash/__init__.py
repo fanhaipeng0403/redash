@@ -1,5 +1,6 @@
 ######################软件日志#####################
 import logging
+import os
 import sys
 import urllib
 
@@ -7,7 +8,7 @@ import urllib
 import redis
 import urlparse
 ########################Web框架#################
-from flask import Flask
+from flask import Flask, safe_join
 from flask_limiter import Limiter
 ########################W插件#################
 from flask_limiter.util import get_ipaddr
@@ -21,7 +22,7 @@ from redash.destinations import import_destinations
 from redash.query_runner import import_query_runners
 from statsd import StatsClient
 from werkzeug.contrib.fixers import ProxyFix
-from werkzeug.routing import BaseConverter
+from werkzeug.routing import BaseConverter, ValidationError
 
 #####定制服务器######
 
@@ -106,6 +107,7 @@ limiter = Limiter(key_func=get_ipaddr, storage_uri=settings.LIMITER_STORAGE)
 # 然后手动register()更好????
 
 
+# 学习这种插件式的配置方法
 import_query_runners(settings.QUERY_RUNNERS)
 # 'redash.query_runner.memsql_ds',
 # 'redash.query_runner.athena',
@@ -132,10 +134,10 @@ reset_new_version_status()
 class SlugConverter(BaseConverter):
     def to_python(self, value):
         # This is ay workaround for when we enable multi-org and some files are being called by the index rule:
-        # for path in settings.STATIC_ASSETS_PATHS:
-        #     full_path = safe_join(path, value)
-        #     if os.path.isfile(full_path):
-        #         raise ValidationError()
+        for path in settings.STATIC_ASSETS_PATHS:
+            full_path = safe_join(path, value)
+            if os.path.isfile(full_path):
+                raise ValidationError()
 
         return value
 
@@ -184,8 +186,9 @@ def create_app(load_admin=True):
                 static_folder=settings.STATIC_ASSETS_PATH,
                 static_path='/static')
 
-    # Make sure we get the right referral address even behind proxies like nginx.
-    # 难点。。。。
+    # https://www.kancloud.cn/wizardforcel/explore-flask/140842
+    # http://python.jobbole.com/84003/
+    # 使用了Nginx后，为了获取真实的请求IP
     app.wsgi_app = ProxyFix(app.wsgi_app, settings.PROXIES_COUNT)
 
     #  定制url
